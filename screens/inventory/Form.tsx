@@ -1,36 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, TextInput, View, Button, SafeAreaView, useWindowDimensions, ScrollView } from 'react-native';
-
-// Reusable ProductForm Component
-const ProductForm = ({ title, formData, setFormData, backgroundColor, fields }: any) => {
-  const handleChange = (key: string, value: string) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      [key]: key === "price" || key === "stock" ? value.replace(/[^0-9.]/g, "") : value,
-    }));
-  };
-
-  return (
-    <View style={[styles.outerContainer, { backgroundColor }]}>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>{title}</Text>
-
-        {fields.map(({ key, placeholder, keyboardType }: any) => (
-          <TextInput
-            key={key}
-            style={styles.input}
-            placeholder={placeholder}
-            keyboardType={keyboardType}
-            value={formData[key]}
-            onChangeText={(text) => handleChange(key, text)}
-          />
-        ))}
-
-        <Button title="Save Product" onPress={() => console.log('Form Data:', formData)} />
-      </View>
-    </View>
-  );
-};
+import { SafeAreaView, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import ProductForm from '@/components/ProductForm';
 
 export default function InventoryForm() {
   const { width, height } = useWindowDimensions();
@@ -51,6 +21,10 @@ export default function InventoryForm() {
     { key: 'price', placeholder: 'Price', keyboardType: 'numeric' },
   ];
 
+  const handleSubmit = (formData: any) => {
+      console.log("Adding New Product:", formData);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -63,6 +37,8 @@ export default function InventoryForm() {
           setFormData={setBarcodedForm}
           backgroundColor="#D0E8C5"
           fields={barcodedFields}
+          action={"Add"}
+          onSubmit={handleSubmit}
         />
         <ProductForm
           title="Generic Products"
@@ -70,6 +46,8 @@ export default function InventoryForm() {
           setFormData={setGenericForm}
           backgroundColor="#FADADD"
           fields={genericFields}
+          action={"Add"}
+          onSubmit={handleSubmit}
         />
       </ScrollView>
     </SafeAreaView>
@@ -79,40 +57,13 @@ export default function InventoryForm() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   scrollContainer: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   rowLayout: {
     flexDirection: 'row',
-    flex: 1
-  },
-  outerContainer: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  formContainer: {
-    padding: 20,
-    backgroundColor: '#FFF',
-    borderRadius: 15,
-    width: '80%',
-    elevation: 5
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center'
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 10
   },
 });
