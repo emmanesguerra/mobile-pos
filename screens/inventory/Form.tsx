@@ -7,7 +7,7 @@ export default function InventoryForm() {
   const isPortrait = height > width;
 
   const [barcodedForm, setBarcodedForm] = useState({ code: '', name: '', price: '', stock: '' });
-  const [genericForm, setGenericForm] = useState({ name: '', price: '' });
+  const [generalForm, setGeneralForm] = useState({ name: '', price: '' });
 
   const barcodedFields = [
     { key: 'code', placeholder: 'Product Code', keyboardType: 'default' },
@@ -16,7 +16,7 @@ export default function InventoryForm() {
     { key: 'stock', placeholder: 'Stock', keyboardType: 'numeric' },
   ];
 
-  const genericFields = [
+  const generalFields = [
     { key: 'name', placeholder: 'Product Name', keyboardType: 'default' },
     { key: 'price', placeholder: 'Price', keyboardType: 'numeric' },
   ];
@@ -39,15 +39,17 @@ export default function InventoryForm() {
           fields={barcodedFields}
           action={"Add"}
           onSubmit={handleSubmit}
+          withCamera={true}
         />
         <ProductForm
-          title="Generic Products"
-          formData={genericForm}
-          setFormData={setGenericForm}
+          title="General Products"
+          formData={generalForm}
+          setFormData={setGeneralForm}
           backgroundColor="#FADADD"
-          fields={genericFields}
+          fields={generalFields}
           action={"Add"}
           onSubmit={handleSubmit}
+          withCamera={false}
         />
       </ScrollView>
     </SafeAreaView>
