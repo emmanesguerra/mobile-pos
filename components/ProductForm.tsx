@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, TouchableOpacity } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { Audio } from 'expo-av';
 
 const ProductForm = ({
     title,
@@ -15,6 +16,8 @@ const ProductForm = ({
 
     const [facing, setFacing] = useState<CameraType>('front');
     const [permission, requestPermission] = useCameraPermissions();
+    const [torch, setTorch] = useState(false);
+    const lastScanTime = useRef(0);
 
     if (!permission) {
         return <View />;
@@ -28,15 +31,31 @@ const ProductForm = ({
             </View>
         );
     }
+    
+    const playBeepSound = async () => {
+        const { sound } = await Audio.Sound.createAsync(
+            require('@/assets/audio/beep.mp3')
+        );
+        await sound.playAsync();
+    };
 
-    const handleChange = (key: string, value: string) => {
+    const handleChange = async (key: string, value: string) => {
         setFormData((prev: any) => ({
             ...prev,
             [key]: key === "price" || key === "stock" ? value.replace(/[^0-9.]/g, "") : value,
         }));
     };
 
-    const handleScanResult = ({ data }: { data: string }) => {
+    const handleScanResult = async ({ data }: { data: string }) => {
+        const now = Date.now();
+    
+        if (now - lastScanTime.current < 3000) {
+            return;
+        }
+    
+        lastScanTime.current = now;
+        await playBeepSound(); 
+    
         setFormData((prev: any) => ({
             ...prev,
             code: data,
@@ -52,11 +71,12 @@ const ProductForm = ({
                     <CameraView
                         onBarcodeScanned={handleScanResult}
                         barcodeScannerSettings={{
-                            barcodeTypes: ['aztec', 'ean13', 'ean8', 'pdf417', 'upc_a', 'upc_e', 'datamatrix', 'code39', 'code93', 'itf14', 'codabar', 'code128'],
+                            barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'],
                         }}
                         style={styles.camera}
                         facing={facing}
-                        zoom={1}>
+                        enableTorch={torch}
+                        zoom={.1}>
                     </CameraView>
                 )}
 
