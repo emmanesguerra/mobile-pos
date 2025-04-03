@@ -4,20 +4,14 @@ import CustomDrawer from '@/components/CustomDrawer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-const DrawerScreen = ({ title, icon }: any) => {
-  const IconComponent = icon;
-  return (
-    <Drawer.Screen
-      name="index"
-      options={{
-        drawerLabel: title,
-        title: 'POS',
-        drawerIcon: ({ color, size }) => (
-          <IconComponent name={icon.name} size={size} color={color} />
-        ),
-      }} />
+
+const getDrawerOptions = (label: string, icon: any) => ({
+  drawerLabel: label,
+  title: label,
+  drawerIcon: ({ color, size }: { color: string; size: number }) => (
+    <icon.component name={icon.name} size={30} color={color} />
   )
-}
+});
 
 export default function Layout() {
   return (
@@ -26,57 +20,55 @@ export default function Layout() {
         drawerContent={(props) => <CustomDrawer {...props} />}
         screenOptions={{
           drawerStyle: {
-            backgroundColor: 'transparent', // Optional: Change background color
-            borderTopLeftRadius: 20, // Optional: Rounded corners
-            borderBottomLeftRadius: 20,
-            marginTop: 70,
-          }
-        }}>
+            backgroundColor: 'transparent',
+            marginTop: 65,
+          },
+          overlayColor: 'rgba(241, 217, 195, 0.5)',
+          drawerLabelStyle: { fontSize: 16, marginLeft: 20 },
+        }}
+        >
         <Drawer.Screen
           name="index"
-          options={{
-            drawerLabel: 'POS',
-            title: 'POS',
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="storefront-outline" size={24} color={color} />
-            ),
-          }} />
+          options={getDrawerOptions(
+            "POS",
+            {
+              name: "storefront-outline",
+              component: Ionicons
+            })}
+        />
         <Drawer.Screen
           name="sales"
-          options={{
-            drawerLabel: 'Transaction History',
-            title: 'Transaction History',
-            drawerIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="history" size={size} color={color} />
-            ),
-          }} />
+          options={getDrawerOptions(
+            "Transaction History",
+            {
+              name: "history",
+              component: MaterialCommunityIcons
+            })}
+        />
         <Drawer.Screen
           name="inventory-list"
-          options={{
-            drawerLabel: 'Products List',
-            title: 'Products List',
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="bag-handle-outline" size={24} color={color} />
-            ),
-          }} />
+          options={getDrawerOptions(
+            "Products List",
+            {
+              name: "bag-handle-outline",
+              component: Ionicons
+            })}
+        />
         <Drawer.Screen
           name="inventory-form"
+          options={getDrawerOptions(
+            "Add Products",
+            {
+              name: "bag-add-outline",
+              component: Ionicons
+            })}
+        />
+        <Drawer.Screen
+          name="sync"
           options={{
-            drawerLabel: 'Add Products',
-            title: 'Add Products',
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="bag-add-outline" size={24} color={color} />
-            ),
+            title: "Sync Data",
+            drawerItemStyle: { display: "none" }
           }} />
-          <Drawer.Screen
-            name="sync"
-            options={{
-              drawerLabel: 'Sync Data',
-              title: 'Sync Data',
-              drawerItemStyle: {
-                display: "none"
-              }
-            }} />
       </Drawer>
     </GestureHandlerRootView>
   );

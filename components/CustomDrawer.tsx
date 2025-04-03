@@ -15,21 +15,17 @@ export default function CustomDrawer(props: any) {
                 {/* Default Drawer Items */}
                 <DrawerItemList
                     {...props}
-                    style={styles.drawerItem}
                 />
-
             </DrawerContentScrollView>
-
-            <View style={[styles.drawerFlex,]}>
-                <DrawerItem
-                    label="Sync Data"
-                    onPress={() => { props.navigation.navigate('sync') }}
-                    style={styles.logoutButton}
-                    icon={({ color, size }) => (
-                        <MaterialCommunityIcons name="database-sync-outline" size={size} color={color} />
-                    )}
-                />
-            </View>
+            <DrawerItem
+                label="Sync Data"
+                onPress={() => { props.navigation.navigate('sync') }}
+                labelStyle={{ fontSize: 16, marginLeft: 20 }}
+                style={styles.syncButton}
+                icon={({ color, size }) => (
+                    <MaterialCommunityIcons name="database-sync-outline" size={30} color={color} />
+                )}
+            />
         </View>
     );
 }
@@ -39,23 +35,16 @@ const styles = StyleSheet.create({
         flex: 1
     },
     drawerContainer: {
-        backgroundColor: '#FFF',
+        backgroundColor: 'rgb(255, 255, 255)',
         paddingTop: 30,
         paddingBottom: 30,
         borderTopEndRadius: 30,
         borderBottomEndRadius: 30,
     },
-    submenuContainer: {
-        paddingLeft: 20,
-        backgroundColor: '#FFF',
-        borderRadius: 5,
-        paddingVertical: 5, 
-    },
-    drawerItem: {
-        marginTop: 50
-    },
-    logoutButton: {
+    syncButton: {
         marginTop: 'auto',
+        marginBottom: 10,
+        paddingLeft: 15,
         backgroundColor: '#FFF',
         borderTopEndRadius: 30,
         borderBottomEndRadius: 30,
