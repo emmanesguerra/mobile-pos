@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { getProducts, getTotalProductsCount } from '@/src/database/products';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
 import { getLowStockProducts } from '@/src/database/products';
+import TableComponent from '@/components/TableComponent';  // Import the TableComponent
 
 export default function InventoryLists() {
   const database = useSQLiteContext();
@@ -14,7 +15,7 @@ export default function InventoryLists() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [threshold, setThreshold] = useState(50);
+  const [threshold, setThreshold] = useState(20);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,17 +57,19 @@ export default function InventoryLists() {
     }
   };
 
-  const renderProduct = ({ item, index }: { item: any; index: number }) => (
-    <View
-      style={[styles.row, { backgroundColor: index % 2 === 0 ? '#FFF' : '#F5EEDC' }]}
-    >
-      <Text style={styles.cell}>{formatDate(item.updated_at)}</Text>
-      <Text style={styles.cell}>{item.product_code}</Text>
-      <Text style={styles.cell}>{item.product_name}</Text>
-      <Text style={styles.cell}>{item.stock}</Text>
-      <Text style={styles.cell}>{item.price}</Text>
-    </View>
-  );
+  const inventoryHeaders = [
+    { field: 'updated_at', label: 'Date Updated' },
+    { field: 'product_code', label: 'Product Code' },
+    { field: 'product_name', label: 'Product Name' },
+    { field: 'stock', label: 'Stock' },
+    { field: 'price', label: 'Price (₱)' }
+  ];
+
+  const lowStockHeaders = [
+    { field: 'product_name', label: 'Product Name' },
+    { field: 'stock', label: 'Stock' },
+    { field: 'price', label: 'Price (₱)' }
+  ];
 
   // Calculate total pages
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
@@ -92,21 +95,17 @@ export default function InventoryLists() {
           </TouchableOpacity>
         </View>
 
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <Text style={styles.headerText}>Date Updated</Text>
-          <Text style={styles.headerText}>Product Code</Text>
-          <Text style={styles.headerText}>Product Name</Text>
-          <Text style={styles.headerText}>Stock</Text>
-          <Text style={styles.headerText}>Price (₱)</Text>
-        </View>
-
-        {/* Table Rows */}
-        <FlatList
-          data={products}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
+        {/* Render Product Table */}
+        <TableComponent
+          headers={inventoryHeaders}
+          data={products.map(product => ({
+            updated_at: formatDate(product.updated_at),
+            product_code: product.product_code,
+            product_name: product.product_name,
+            stock: product.stock,
+            price: product.price,
+            id: product.id,
+          }))}
         />
 
         {/* Pagination Controls */}
@@ -142,27 +141,15 @@ export default function InventoryLists() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Low Stock Products</Text>
 
-            {/* Table Header */}
-            <View style={styles.tableHeader}>
-              <Text style={styles.tableHeaderText}>Product Name</Text>
-              <Text style={styles.tableHeaderText}>Stock</Text>
-              <Text style={styles.tableHeaderText}>Price (₱)</Text>
-            </View>
-
-            {/* Table Rows */}
-            <FlatList
-              data={lowStockProducts}
-              renderItem={({ item }) => {
-                return (
-                  <View style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{item.product_name}</Text>
-                    <Text style={styles.tableCell}>{item.stock}</Text>
-                    <Text style={styles.tableCell}>₱{item.price.toFixed(2)}</Text>
-                  </View>
-                );
-              }}
-              keyExtractor={(item) => item.id.toString()}
-              showsVerticalScrollIndicator={false}
+            {/* Render Low Stock Product Table */}
+            <TableComponent
+              headers={lowStockHeaders}
+              data={lowStockProducts.map(item => ({
+                product_name: item.product_name,
+                stock: item.stock,
+                price: item.price,
+                id: item.id,
+              }))}
             />
 
             <TouchableOpacity
@@ -171,10 +158,16 @@ export default function InventoryLists() {
             >
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setIsModalVisible(false)} // Close the modal
+            >
+              <Text style={styles.buttonText}>Print</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -279,8 +272,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: '80%',
-    maxHeight: '80%',
-    alignItems: 'center',
+    maxHeight: '80%'
   },
   modalTitle: {
     fontSize: 24,
