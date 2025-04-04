@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { getOrders, getOrderItems } from '@/src/database/orders';
-import { getProducts } from '@/src/database/products';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
 
@@ -9,18 +8,15 @@ export default function TransactionLists() {
   const database = useSQLiteContext();
   const [orders, setOrders] = useState<any[]>([]);
   const [orderItems, setOrderItems] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const fetchedOrders = await getOrders(database);
         const fetchedOrderItems = await getOrderItems(database);
-        const fetchedProducts = await getProducts(database);
 
         setOrders(fetchedOrders);
         setOrderItems(fetchedOrderItems);
-        setProducts(fetchedProducts);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -50,19 +46,6 @@ export default function TransactionLists() {
     </View>
   );
 
-  // Render each product
-  const renderProducts = ({ item }: { item: any }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>Product ID: {item.id}</Text>
-      <Text style={styles.text}>Product Code: {item.product_code}</Text>
-      <Text style={styles.text}>Product Name: {item.product_name}</Text>
-      <Text style={styles.text}>Stock: {item.stock}</Text>
-      <Text style={styles.text}>Price: ${item.price}</Text>
-      <Text style={styles.text}>CDate: {formatDate(item.created_at)}</Text>
-      <Text style={styles.text}>UDate: {formatDate(item.updated_at)}</Text>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Transaction List</Text>
@@ -78,13 +61,6 @@ export default function TransactionLists() {
       <FlatList
         data={orderItems}
         renderItem={renderOrderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
-
-      <Text style={styles.sectionTitle}>Products</Text>
-      <FlatList
-        data={products}
-        renderItem={renderProducts}
         keyExtractor={(item) => item.id.toString()}
       />
     </View>
