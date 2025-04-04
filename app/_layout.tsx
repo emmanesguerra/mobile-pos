@@ -3,6 +3,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import CustomDrawer from '@/components/CustomDrawer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { initializeDatabase } from '@/src/database/init';
+import { SQLiteProvider } from 'expo-sqlite';
 
 
 const getDrawerOptions = (label: string, icon: any) => ({
@@ -14,62 +16,65 @@ const getDrawerOptions = (label: string, icon: any) => ({
 });
 
 export default function Layout() {
+
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#F00' }}>
-      <Drawer
-        drawerContent={(props) => <CustomDrawer {...props} />}
-        screenOptions={{
-          drawerStyle: {
-            backgroundColor: 'transparent',
-            marginTop: 65,
-          },
-          overlayColor: 'rgba(241, 217, 195, 0.5)',
-          drawerLabelStyle: { fontSize: 16, marginLeft: 20 },
-        }}
+    <SQLiteProvider databaseName="pos_system.db" onInit={initializeDatabase}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#F00' }}>
+        <Drawer
+          drawerContent={(props) => <CustomDrawer {...props} />}
+          screenOptions={{
+            drawerStyle: {
+              backgroundColor: 'transparent',
+              marginTop: 65,
+            },
+            overlayColor: 'rgba(241, 217, 195, 0.5)',
+            drawerLabelStyle: { fontSize: 16, marginLeft: 20 },
+          }}
         >
-        <Drawer.Screen
-          name="index"
-          options={getDrawerOptions(
-            "POS",
-            {
-              name: "storefront-outline",
-              component: Ionicons
-            })}
-        />
-        <Drawer.Screen
-          name="sales"
-          options={getDrawerOptions(
-            "Transaction History",
-            {
-              name: "history",
-              component: MaterialCommunityIcons
-            })}
-        />
-        <Drawer.Screen
-          name="inventory-list"
-          options={getDrawerOptions(
-            "Products List",
-            {
-              name: "bag-handle-outline",
-              component: Ionicons
-            })}
-        />
-        <Drawer.Screen
-          name="inventory-form"
-          options={getDrawerOptions(
-            "Add Products",
-            {
-              name: "bag-add-outline",
-              component: Ionicons
-            })}
-        />
-        <Drawer.Screen
-          name="sync"
-          options={{
-            title: "Sync Data",
-            drawerItemStyle: { display: "none" }
-          }} />
-      </Drawer>
-    </GestureHandlerRootView>
+          <Drawer.Screen
+            name="index"
+            options={getDrawerOptions(
+              "POS",
+              {
+                name: "storefront-outline",
+                component: Ionicons
+              })}
+          />
+          <Drawer.Screen
+            name="sales"
+            options={getDrawerOptions(
+              "Transaction History",
+              {
+                name: "history",
+                component: MaterialCommunityIcons
+              })}
+          />
+          <Drawer.Screen
+            name="inventory-list"
+            options={getDrawerOptions(
+              "Products List",
+              {
+                name: "bag-handle-outline",
+                component: Ionicons
+              })}
+          />
+          <Drawer.Screen
+            name="inventory-form"
+            options={getDrawerOptions(
+              "Add Products",
+              {
+                name: "bag-add-outline",
+                component: Ionicons
+              })}
+          />
+          <Drawer.Screen
+            name="sync"
+            options={{
+              title: "Sync Data",
+              drawerItemStyle: { display: "none" }
+            }} />
+        </Drawer>
+      </GestureHandlerRootView>
+    </SQLiteProvider>
   );
 }

@@ -1,12 +1,121 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { getOrders, getOrderItems } from '@/src/database/orders';
+import { getProducts } from '@/src/database/products';
+import { useSQLiteContext } from 'expo-sqlite';
+import { formatDate } from '@/src/services/dateService';
 
 export default function TransactionLists() {
-  return (
-    <View>
-      <Text>TransactionLists</Text>
+  const database = useSQLiteContext();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedOrders = await getOrders(database);
+        const fetchedOrderItems = await getOrderItems(database);
+        const fetchedProducts = await getProducts(database);
+
+        setOrders(fetchedOrders);
+        setOrderItems(fetchedOrderItems);
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Render each order
+  const renderOrders = ({ item }: { item: any }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>Order ID: {item.id}</Text>
+      <Text style={styles.text}>Ref Code: {item.ref_code}</Text>
+      <Text style={styles.text}>Total: ${item.total}</Text>
+      <Text style={styles.text}>Date: {formatDate(item.date)}</Text>
     </View>
-  )
+  );
+
+  // Render each order item
+  const renderOrderItem = ({ item }: { item: any }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>Order Item ID: {item.id}</Text>
+      <Text style={styles.text}>Order ID: {item.order_id}</Text>
+      <Text style={styles.text}>Product ID: {item.product_id}</Text>
+      <Text style={styles.text}>Quantity: {item.quantity}</Text>
+      <Text style={styles.text}>Price: ${item.price}</Text>
+    </View>
+  );
+
+  // Render each product
+  const renderProducts = ({ item }: { item: any }) => (
+    <View style={styles.item}>
+      <Text style={styles.text}>Product ID: {item.id}</Text>
+      <Text style={styles.text}>Product Code: {item.product_code}</Text>
+      <Text style={styles.text}>Product Name: {item.product_name}</Text>
+      <Text style={styles.text}>Stock: {item.stock}</Text>
+      <Text style={styles.text}>Price: ${item.price}</Text>
+      <Text style={styles.text}>CDate: {formatDate(item.created_at)}</Text>
+      <Text style={styles.text}>UDate: {formatDate(item.updated_at)}</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Transaction List</Text>
+
+      <Text style={styles.sectionTitle}>Orders</Text>
+      <FlatList
+        data={orders}
+        renderItem={renderOrders}
+        keyExtractor={(item) => item.id.toString()}
+      />
+
+      <Text style={styles.sectionTitle}>Order Items</Text>
+      <FlatList
+        data={orderItems}
+        renderItem={renderOrderItem}
+        keyExtractor={(item) => item.id.toString()}
+      />
+
+      <Text style={styles.sectionTitle}>Products</Text>
+      <FlatList
+        data={products}
+        renderItem={renderProducts}
+        keyExtractor={(item) => item.id.toString()}
+      />
+    </View>
+  );
 }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+  },
+  item: {
+    marginBottom: 15,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+  },
+  text: {
+    fontSize: 16,
+    color: '#333',
+  },
+});
