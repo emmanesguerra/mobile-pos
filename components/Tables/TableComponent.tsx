@@ -10,17 +10,12 @@ interface TableComponentProps {
 
 const TableComponent: React.FC<TableComponentProps> = ({ headers, data }) => {
 
-    console.log("TableComponent Data:", data); // Log the data to check its structure
-
     // Function to render each row
     const renderRow = ({ item }: { item: any }) => (
         <View style={styles.tableRow}>
             {headers.map((header, idx) => (
                 <Text key={idx} style={styles.tableCell}>
-                    {header.field === 'updated_at' 
-                        ? formatDate(item[header.field])  // If it's the date, format it
-                        : item[header.field]  // Otherwise just display the field value
-                    }
+                    { item[header.field] }
                 </Text>
             ))}
         </View>

@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { getProducts, getTotalProductsCount } from '@/src/database/products';
+import { getProducts, getTotalProductsCount, getLowStockProducts } from '@/src/database/products';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
-import { getLowStockProducts } from '@/src/database/products';
-import TableComponent from '@/components/TableComponent';  // Import the TableComponent
+import TableComponent from '@/components/Tables/TableComponent';  // Import the TableComponent
+import ModalComponent from '@/components/ModalComponent';  // Import the TableComponent
 
 export default function InventoryLists() {
   const database = useSQLiteContext();
@@ -75,10 +75,9 @@ export default function InventoryLists() {
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, padding: 20, backgroundColor: '#DDA853' }}>
       <View style={styles.innerContainer}>
-
-        {/* Search Field and Action Buttons */}
+        {/* Search and action buttons */}
         <View style={styles.searchAndButtons}>
           <TextInput
             style={styles.searchInput}
@@ -91,14 +90,14 @@ export default function InventoryLists() {
             style={[styles.button, styles.displayButton]}
             onPress={handleDisplayLowStock}
           >
-            <Text style={[styles.buttonText, styles.searchText]}>Insufficient Stocks</Text>
+            <Text style={[styles.buttonText]}>Insufficient Stocks</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Render Product Table */}
+        {/* Product Table */}
         <TableComponent
           headers={inventoryHeaders}
-          data={products.map(product => ({
+          data={products.map((product) => ({
             updated_at: formatDate(product.updated_at),
             product_code: product.product_code,
             product_name: product.product_name,
@@ -128,46 +127,25 @@ export default function InventoryLists() {
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Modal to show low stock products */}
+        <ModalComponent
+          isVisible={isModalVisible}
+          title="Low Stock Products"
+          onClose={() => setIsModalVisible(false)}
+        >
+          <TableComponent
+            headers={lowStockHeaders}
+            data={lowStockProducts.map((item) => ({
+              product_name: item.product_name,
+              stock: item.stock,
+              price: item.price,
+              id: item.id,
+            }))}
+          />
+        </ModalComponent>
+
       </View>
-
-      {/* Modal for Low Stock Products */}
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Low Stock Products</Text>
-
-            {/* Render Low Stock Product Table */}
-            <TableComponent
-              headers={lowStockHeaders}
-              data={lowStockProducts.map(item => ({
-                product_name: item.product_name,
-                stock: item.stock,
-                price: item.price,
-                id: item.id,
-              }))}
-            />
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setIsModalVisible(false)} // Close the modal
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setIsModalVisible(false)} // Close the modal
-            >
-              <Text style={styles.buttonText}>Print</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -185,11 +163,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     elevation: 5,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   searchAndButtons: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -203,40 +176,6 @@ const styles = StyleSheet.create({
     padding: 15,
     fontSize: 18,
     flex: 1,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 10,
-    paddingTop: 10,
-    backgroundColor: '#27548A',
-  },
-  headerText: {
-    flex: 1,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#FFF',
-    fontSize: 18,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  cell: {
-    flex: 1,
-    textAlign: 'center',
-    padding: 8,
-    fontSize: 18,
-    color: '#333',
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  pageNumber: {
-    fontSize: 16,
   },
   button: {
     paddingVertical: 10,
@@ -258,52 +197,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 0,
   },
-  searchText: {
-    padding: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxHeight: '80%'
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  tableHeaderText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 16,
-    width: '33%',
-  },
-  tableRow: {
+  pagination: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    marginTop: 20,
   },
-  tableCell: {
-    textAlign: 'center',
+  pageNumber: {
     fontSize: 16,
-    width: '33%',
-  },
-  noDataText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#888',
   },
 });
