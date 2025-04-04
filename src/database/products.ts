@@ -36,3 +36,16 @@ export const getTotalProductsCount = async (database: SQLiteDatabase, searchTerm
         return 0;
     }
 };
+
+export const getLowStockProducts = async (database: SQLiteDatabase, threshold: number, searchTerm: string = ''): Promise<any[]> => {
+    try {
+        const query = 'SELECT * FROM products WHERE stock <= ?';
+        const result = await database.getAllAsync(query, [threshold]);
+
+        return result;
+    } catch (error) {
+        console.error('Error fetching low stock products:', error);
+        return [];
+    }
+};
+
