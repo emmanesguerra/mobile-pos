@@ -1,22 +1,23 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { getProducts, getTotalProductsCount, getLowStockProducts } from '@/src/database/products';
+import { getSettingValue } from '@/src/database/settings';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
 import TableComponent from '@/components/Tables/TableComponent';
 import PaginationControls from '@/components/Tables/PaginationControls';
 import ModalComponent from '@/components/ModalComponent';
+import { useSettingsContext } from '@/src/contexts/SettingsContext';
 
 export default function InventoryLists() {
   const database = useSQLiteContext();
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
   const [totalProducts, setTotalProducts] = useState(0);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [threshold, setThreshold] = useState(30);
+  const {threshold, itemsPerPage } = useSettingsContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +37,7 @@ export default function InventoryLists() {
     };
 
     fetchData();
-  }, [searchQuery, currentPage]);
+  }, [searchQuery, itemsPerPage, currentPage]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -76,7 +77,7 @@ export default function InventoryLists() {
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
 
   return (
-    <View style={{ flex: 1, padding: 20, backgroundColor: '#DDA853' }}>
+    <View style={styles.container}>
       <View style={styles.innerContainer}>
         {/* Search and action buttons */}
         <View style={styles.searchAndButtons}>

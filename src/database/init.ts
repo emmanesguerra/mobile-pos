@@ -42,6 +42,15 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
             `
         );
 
+        await database.execAsync(
+            `
+            CREATE TABLE IF NOT EXISTS settings (
+              key TEXT PRIMARY KEY,
+              value TEXT
+            );
+            `
+        );
+
         console.log('DB tables created successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
