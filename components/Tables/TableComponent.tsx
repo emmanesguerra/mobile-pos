@@ -43,7 +43,6 @@ const TableComponent: React.FC<TableComponentProps> = ({ headers, data }) => {
     );
 };
 
-// Helper function to format dates (if needed)
 const formatDate = (date: string) => {
     const formattedDate = new Date(date);
     return formattedDate.toLocaleDateString();

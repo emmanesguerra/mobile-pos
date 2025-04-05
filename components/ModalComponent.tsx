@@ -25,14 +25,16 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           {/* Render dynamic content (passed as children) */}
           {children}
 
-          <TouchableOpacity style={styles.button} onPress={onClose}>
-            <Text style={styles.buttonText}>Close</Text>
-          </TouchableOpacity>
-          {onPrint && (
-            <TouchableOpacity style={styles.button} onPress={onPrint}>
-              <Text style={styles.buttonText}>Print</Text>
+          <View style={styles.buttonGroup}>
+            <TouchableOpacity style={[styles.button, { marginRight: 20, backgroundColor: 'gray' }]} onPress={onClose}>
+              <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
-          )}
+            {onPrint && (
+              <TouchableOpacity style={[styles.button]} onPress={onPrint}>
+                <Text style={styles.buttonText}>Print</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </Modal>
@@ -59,6 +61,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -70,7 +76,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },
