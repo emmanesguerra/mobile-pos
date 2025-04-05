@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { getProducts, getTotalProductsCount, getLowStockProducts } from '@/src/database/products';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
-import TableComponent from '@/components/Tables/TableComponent';  // Import the TableComponent
-import ModalComponent from '@/components/ModalComponent';  // Import the TableComponent
+import TableComponent from '@/components/Tables/TableComponent';
+import PaginationControls from '@/components/Tables/PaginationControls';
+import ModalComponent from '@/components/ModalComponent';
 
 export default function InventoryLists() {
   const database = useSQLiteContext();
@@ -15,7 +16,7 @@ export default function InventoryLists() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [threshold, setThreshold] = useState(20);
+  const [threshold, setThreshold] = useState(30);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,25 +109,11 @@ export default function InventoryLists() {
         />
 
         {/* Pagination Controls */}
-        <View style={styles.pagination}>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: currentPage === 1 ? '#ccc' : '#27548A' }]}
-            onPress={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            <Text style={styles.buttonText}>Previous</Text>
-          </TouchableOpacity>
-          <Text style={styles.pageNumber}>
-            Page {currentPage} of {totalPages}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: currentPage === totalPages ? '#ccc' : '#27548A' }]}
-            onPress={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
 
         {/* Modal to show low stock products */}
         <ModalComponent
@@ -173,8 +160,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 15,
-    fontSize: 18,
+    paddingHorizontal: 15,
+    fontSize: 16,
     flex: 1,
   },
   button: {
@@ -196,14 +183,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#8E1616',
     marginLeft: 10,
     marginTop: 0,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  pageNumber: {
-    fontSize: 16,
   },
 });

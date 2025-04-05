@@ -51,7 +51,8 @@ const formatDate = (date: string) => {
 
 const styles = StyleSheet.create({
     tableContainer: {
-        marginTop: 20,
+        marginTop: 5,
+        maxHeight: '80%',
     },
     tableHeader: {
         flexDirection: 'row',
@@ -63,19 +64,19 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: 'center',
         color: '#FFF',
-        fontSize: 16,
+        fontSize: 18,
     },
     tableRow: {
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        paddingVertical: 10,
+        paddingVertical: 12,
         paddingHorizontal: 15,
     },
     tableCell: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: 16,
     },
 });
 
