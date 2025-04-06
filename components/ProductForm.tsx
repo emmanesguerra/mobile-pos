@@ -1,7 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, TouchableOpacity } from 'react-native';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { Audio } from 'expo-av';
 
 const ProductForm = ({
     title,
@@ -13,52 +11,30 @@ const ProductForm = ({
     onSubmit,
     withCamera
 }: any) => {
+    const [selectedBgColor, setSelectedBgColor] = useState(formData.bgColor || '#9FB3DF');
+    const colorOptions = [
+        '#9FB3DF',
+        '#9EC6F3',
+        '#A5B68D',
+        '#9F5255',
+        '#FFB4A2',
+        '#8174A0',
+        '#DE8F5F',
+        '#C96868'
+    ];
 
-    const [facing, setFacing] = useState<CameraType>('front');
-    const [permission, requestPermission] = useCameraPermissions();
-    const [torch, setTorch] = useState(false);
-    const lastScanTime = useRef(0);
-
-    if (!permission) {
-        return <View />;
-    }
-
-    if (!permission.granted) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.message}>We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="grant permission" />
-            </View>
-        );
-    }
-    
-    const playBeepSound = async () => {
-        const { sound } = await Audio.Sound.createAsync(
-            require('@/assets/audio/beep.mp3')
-        );
-        await sound.playAsync();
-    };
-
-    const handleChange = async (key: string, value: string) => {
+    const handleChange = (key: string, value: string) => {
         setFormData((prev: any) => ({
             ...prev,
-            [key]: key === "price" || key === "stock" ? value.replace(/[^0-9.]/g, "") : value,
+            [key]: key === 'price' || key === 'stock' ? value.replace(/[^0-9.]/g, '') : value,
         }));
     };
 
-    const handleScanResult = async ({ data }: { data: string }) => {
-        const now = Date.now();
-    
-        if (now - lastScanTime.current < 3000) {
-            return;
-        }
-    
-        lastScanTime.current = now;
-        await playBeepSound(); 
-    
+    const handleColorSelection = (color: string) => {
+        setSelectedBgColor(color);
         setFormData((prev: any) => ({
             ...prev,
-            code: data,
+            bgColor: color,
         }));
     };
 
@@ -67,29 +43,40 @@ const ProductForm = ({
             <View style={styles.formContainer}>
                 <Text style={styles.title}>{title}</Text>
 
-                {withCamera && (
-                    <CameraView
-                        onBarcodeScanned={handleScanResult}
-                        barcodeScannerSettings={{
-                            barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'],
-                        }}
-                        style={styles.camera}
-                        facing={facing}
-                        enableTorch={torch}
-                        zoom={.1}>
-                    </CameraView>
-                )}
+                {fields.map(({ key, placeholder, keyboardType }: any) => {
+                    if (keyboardType === 'picker') {
+                        return (
+                            <View key={key} style={styles.pickerContainer}>
+                                <Text style={{ color: '#7b7b7b' }}>{placeholder}</Text>
+                                <View style={styles.colorOptionsContainer}>
+                                    {/* Color options with circles */}
+                                    {colorOptions.map((color) => (
+                                        <TouchableOpacity
+                                            key={color}
+                                            style={[styles.colorCircle, { backgroundColor: color }]}
+                                            onPress={() => handleColorSelection(color)}
+                                        >
+                                            {selectedBgColor === color && (
+                                                <View style={styles.selectedIndicator} />
+                                            )}
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        );
+                    }
 
-                {fields.map(({ key, placeholder, keyboardType }: any) => (
-                    <TextInput
-                        key={key}
-                        style={styles.input}
-                        placeholder={placeholder}
-                        keyboardType={keyboardType}
-                        value={formData[key]}
-                        onChangeText={(text) => handleChange(key, text)}
-                    />
-                ))}
+                    return (
+                        <TextInput
+                            key={key}
+                            style={styles.input}
+                            placeholder={placeholder}
+                            keyboardType={keyboardType}
+                            value={formData[key]}
+                            onChangeText={(text) => handleChange(key, text)}
+                        />
+                    );
+                })}
 
                 <Button title={`${action} Product`} onPress={() => onSubmit(formData)} />
             </View>
@@ -125,21 +112,33 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 10,
     },
-
-
-    container: {
-        flex: 1,
+    pickerContainer: {
+        marginBottom: 10,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+    },
+    colorOptionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    colorCircle: {
+        width: 30,
+        height: 30,
+        borderRadius: 20,
+        margin: 5,
         justifyContent: 'center',
+        alignItems: 'center',
     },
-    message: {
-        textAlign: 'center',
-        paddingBottom: 10,
+    selectedIndicator: {
+        width: 15,
+        height: 15,
+        borderRadius: 10,
+        backgroundColor: 'white',
     },
-    camera: {
-        width: '100%',
-        height: 200,
-        marginBottom: 10
-    }
 });
 
 export default ProductForm;

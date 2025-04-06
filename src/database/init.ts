@@ -11,6 +11,7 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
                 stock INTEGER,
                 price REAL,
                 isBarcoded INTEGER CHECK(isBarcoded IN (0,1)),
+                bgColor TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );

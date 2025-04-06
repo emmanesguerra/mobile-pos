@@ -19,6 +19,7 @@ export default function InventoryForm() {
   const generalFields = [
     { key: 'name', placeholder: 'Product Name', keyboardType: 'default' },
     { key: 'price', placeholder: 'Price', keyboardType: 'numeric' },
+    { key: 'bgColor', placeholder: 'Background Color', keyboardType: 'picker' },
   ];
 
   const handleSubmit = (formData: any) => {
