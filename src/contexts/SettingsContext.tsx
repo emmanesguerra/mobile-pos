@@ -6,8 +6,10 @@ import { useSQLiteContext } from 'expo-sqlite';
 interface SettingsContextType {
   threshold: number;
   itemsPerPage: number;
+  productRefresh: boolean;
   setThreshold: (value: number) => void;
   setItemsPerPage: (value: number) => void;
+  setProductRefresh: (value: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -28,6 +30,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const database = useSQLiteContext();
   const [threshold, setThreshold] = useState<number>(0);
   const [itemsPerPage, setItemsPerPage] = useState<number>(0);
+  const [productRefresh, setProductRefresh] = useState<boolean>(false); 
 
   // Function to fetch the current setting values
   const fetchSettings = async () => {
@@ -44,7 +47,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   }, []);
 
   return (
-    <SettingsContext.Provider value={{ threshold, itemsPerPage, setThreshold, setItemsPerPage }}>
+    <SettingsContext.Provider value={{ threshold, itemsPerPage, productRefresh, setThreshold, setItemsPerPage, setProductRefresh }}>
       {children}
     </SettingsContext.Provider>
   );

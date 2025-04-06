@@ -65,3 +65,26 @@ export const getNonBarcodedProducts = async (database: SQLiteDatabase): Promise<
         return [];
     }
 };
+
+export const insertProduct = async (
+    database: SQLiteDatabase,
+    productCode: string,
+    productName: string,
+    stock: number,
+    price: number,
+    isBarcoded: number,
+    bgColor: string
+) => {
+    try {
+        console.log('Inserting product:');
+
+        await database.runAsync(
+            'INSERT INTO products (product_code, product_name, stock, price, isBarcoded, bgColor) VALUES (?, ?, ?, ?, ?, ?);',
+            [productCode, productName, stock, price, isBarcoded, bgColor]
+        );
+
+        console.log('Product inserted successfully!');
+    } catch (error) {
+        console.error('Error inserting product:', error);
+    }
+};

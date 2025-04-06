@@ -17,7 +17,7 @@ export default function InventoryLists() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const {threshold, itemsPerPage } = useSettingsContext();
+  const { threshold, itemsPerPage, productRefresh, setProductRefresh } = useSettingsContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +36,13 @@ export default function InventoryLists() {
       }
     };
 
-    fetchData();
-  }, [searchQuery, itemsPerPage, currentPage]);
+    if (productRefresh) {
+      fetchData(); // Refetch products if productRefresh is true
+      setProductRefresh(false); // Reset product refresh state after fetching
+    } else {
+      fetchData(); // Normal fetch without refresh
+    }
+  }, [searchQuery, itemsPerPage, currentPage, productRefresh, setProductRefresh]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
