@@ -49,3 +49,19 @@ export const getLowStockProducts = async (database: SQLiteDatabase, threshold: n
     }
 };
 
+export const getNonBarcodedProducts = async (database: SQLiteDatabase): Promise<any[]> => {
+    try {
+        const query = `
+            SELECT * FROM products
+            WHERE isBarcoded = 0
+            ORDER BY id DESC
+            LIMIT 10;
+        `;
+
+        const result = await database.getAllAsync(query);
+        return result;
+    } catch (error) {
+        console.error('Error fetching non-barcoded products:', error);
+        return [];
+    }
+};

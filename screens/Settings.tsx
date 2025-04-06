@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { saveSetting, getSettingValue } from '@/src/database/settings';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
+import { Picker } from '@react-native-picker/picker';
 
 export default function Settings() {
   const database = useSQLiteContext();
@@ -12,7 +13,7 @@ export default function Settings() {
   const fetchSettings = async () => {
     const rows = await getSettingValue(database, 'tableRows');
     const thresholdValue = await getSettingValue(database, 'lowStockThreshold');
-    
+
     if (rows) setItemsPerPage(parseInt(rows, 10));
     if (thresholdValue) setThreshold(parseInt(thresholdValue, 10));
   };
@@ -27,7 +28,7 @@ export default function Settings() {
     await saveSetting(database, key, value);
     alert(`Setting saved: ${key} = ${value}`);
   };
-  
+
   const handleChangeItemsPerPage = (text: string) => {
     const value = text === '' ? 0 : parseInt(text, 10);
     setItemsPerPage(value);
@@ -45,30 +46,36 @@ export default function Settings() {
           <Text style={styles.question}>
             Number of rows to show in the table:
           </Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={String(itemsPerPage)}
-            onChangeText={handleChangeItemsPerPage}
-            placeholder="Enter number of rows"
-            placeholderTextColor="#888"
-            onBlur={() => handleBlur('tableRows', String(itemsPerPage))} // Save on blur
-          />
+          <Picker
+            selectedValue={itemsPerPage}
+            onValueChange={(value) => {
+              handleChangeItemsPerPage(String(value));
+              handleBlur('tableRows', String(value)); // Save on change
+            }}
+            style={styles.input} // Reuse your styling
+          >
+            {[5, 6, 7, 8, 9, 10, 15, 20, 25].map((value) => (
+              <Picker.Item key={value} label={`${value}`} value={value} />
+            ))}
+          </Picker>
         </View>
 
         <View style={styles.settingItem}>
           <Text style={styles.question}>
             Low stock threshold:
           </Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={String(threshold)}
-            onChangeText={handleChangeThreshold} 
-            placeholder="Enter stock threshold"
-            placeholderTextColor="#888"
-            onBlur={() => handleBlur('lowStockThreshold', String(threshold))} // Save on blur
-          />
+          <Picker
+            selectedValue={threshold}
+            onValueChange={(value) => {
+              handleChangeThreshold(String(value));
+              handleBlur('lowStockThreshold', String(value)); // Save on change
+            }}
+            style={styles.input} // Reuse your styling
+          >
+            {[5, 10, 15, 20, 25, 30, 40, 50].map((value) => (
+              <Picker.Item key={value} label={`${value}`} value={value} />
+            ))}
+          </Picker>
         </View>
       </View>
     </View>
@@ -100,14 +107,14 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    width: 250,
+    width: 100,
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
+    backgroundColor: '#F5EEDC',
     fontSize: 18,
-    backgroundColor: '#F9F9F9',
-    color: '#000',
+    color: '#000'
   },
 });

@@ -48,6 +48,10 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
               key TEXT PRIMARY KEY,
               value TEXT
             );
+
+            INSERT OR IGNORE INTO settings (key, value)
+            VALUES ('lowStockThreshold', '5');
+            VALUES ('tableRows', '9');
             `
         );
 
