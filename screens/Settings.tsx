@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { saveSetting, getSettingValue } from '@/src/database/settings';
+import { saveSetting } from '@/src/database/settings';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
 import { Picker } from '@react-native-picker/picker';
@@ -8,20 +8,6 @@ import { Picker } from '@react-native-picker/picker';
 export default function Settings() {
   const database = useSQLiteContext();
   const { threshold, setThreshold, itemsPerPage, setItemsPerPage } = useSettingsContext();
-
-  // Function to fetch the current setting values
-  const fetchSettings = async () => {
-    const rows = await getSettingValue(database, 'tableRows');
-    const thresholdValue = await getSettingValue(database, 'lowStockThreshold');
-
-    if (rows) setItemsPerPage(parseInt(rows, 10));
-    if (thresholdValue) setThreshold(parseInt(thresholdValue, 10));
-  };
-
-  // Fetch settings when the component mounts
-  useEffect(() => {
-    fetchSettings();
-  }, []);
 
   // Handle saving the settings when input loses focus
   const handleBlur = async (key: string, value: string) => {

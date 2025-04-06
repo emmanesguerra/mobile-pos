@@ -19,8 +19,8 @@ const getDrawerOptions = (label: string, icon: any) => ({
 export default function Layout() {
 
   return (
-    <SettingsProvider>
-      <SQLiteProvider databaseName="pos_system.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="pos_system.db" onInit={initializeDatabase}>
+      <SettingsProvider>
         <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#F00' }}>
           <Drawer
             drawerContent={(props) => <CustomDrawer {...props} />}
@@ -83,7 +83,7 @@ export default function Layout() {
               }} />
           </Drawer>
         </GestureHandlerRootView>
-      </SQLiteProvider>
-    </SettingsProvider>
+      </SettingsProvider>
+    </SQLiteProvider>
   );
 }
