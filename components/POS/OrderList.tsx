@@ -42,13 +42,13 @@ const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, ha
       {/* Order Summary */}
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total: ₱{total}</Text>
-        <Text style={styles.subtotalText}>Paid Amount: ₱{paidAmount}</Text>
         <Text style={styles.subtotalText}>
           Change (₱{paidAmount} - ₱{total}) :
           <Text
             style={{
-              color: change < 0 ? 'red' : 'black', // Change color of the amount if less than 0
+              color: change < 0 ? '#F00' : '#008000',
               fontWeight: 'bold',
+              fontSize: 20
             }}
           >
             ₱{change}
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   subtotalText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'right',
     paddingRight: 10,

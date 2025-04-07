@@ -6,6 +6,7 @@ import QuickList from '@/components/POS/QuickList';
 import { useSQLiteContext } from 'expo-sqlite';
 import { getNonBarcodedProducts } from '@/src/database/products';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
+import NumericKeypad from '@/components/POS/NumericKeypad'; // Import the new component
 
 export default function Pos() {
   const database = useSQLiteContext();
@@ -79,6 +80,18 @@ export default function Pos() {
     }
   };
 
+  // Handle numeric input
+  const handleNumericInput = (value: string) => {
+    if (value === 'C') {
+      setPaidAmount(0);
+    } else {
+      setPaidAmount((prevAmount) => {
+        const currentAmount = prevAmount;
+        return (currentAmount * 10) + parseInt(value, 10);
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
@@ -93,10 +106,18 @@ export default function Pos() {
           handleClearOrder={handleClearOrder}
         />
 
-        {/* Middle Pane - Placeholder */}
+        {/* Middle Pane */}
         <View style={styles.middlePane}>
-          <Text style={styles.title}>Middle Pane</Text>
-          <Text>Content goes here...</Text>
+          {/* Camera Placeholder */}
+          <View style={styles.cameraBox}>
+            <Text style={styles.cameraText}>Camera Placeholder</Text>
+          </View>
+
+          {/* Numeric Keypad */}
+          <NumericKeypad
+            handleNumericInput={handleNumericInput}
+            displayValue={paidAmount.toString()}
+          />
         </View>
 
         {/* Right Pane - Custom Product List */}
@@ -130,17 +151,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rightPane: {
-    flex: 1,
-    backgroundColor: '#fce4ec',
-    padding: 10,
-    borderRadius: 10,
+  cameraBox: {
+    width: '100%',
+    height: 100,
+    backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
+    borderRadius: 10,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  cameraText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
