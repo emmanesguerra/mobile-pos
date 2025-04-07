@@ -69,6 +69,8 @@ export default function InventoryForm() {
 
       setProductRefresh(true);
 
+      alert( `Product ${productName} addedd successfully!`);
+
       console.log("Product added:", formData);
     } catch (error) {
       console.error("Error handling submit:", error);

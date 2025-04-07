@@ -1,11 +1,11 @@
 import React from 'react';
 import { FlatList, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 
-const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, handleSubmitOrder }: any) => {
+const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, handleSubmitOrder, handleClearOrder }: any) => {
   return (
     <View style={styles.leftPane}>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <TouchableOpacity style={styles.clearButton} onPress={handleSubmitOrder}>
+        <TouchableOpacity style={styles.clearButton} onPress={handleClearOrder}>
           <Text style={styles.clearButtonText}>Clear Items</Text>
         </TouchableOpacity>
       </View>
@@ -43,7 +43,17 @@ const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, ha
       <View style={styles.totalContainer}>
         <Text style={styles.totalText}>Total: ₱{total}</Text>
         <Text style={styles.subtotalText}>Paid Amount: ₱{paidAmount}</Text>
-        <Text style={styles.subtotalText}>Change (₱{paidAmount} - ₱{total}) : ₱{change}</Text>
+        <Text style={styles.subtotalText}>
+          Change (₱{paidAmount} - ₱{total}) :
+          <Text
+            style={{
+              color: change < 0 ? 'red' : 'black', // Change color of the amount if less than 0
+              fontWeight: 'bold',
+            }}
+          >
+            ₱{change}
+          </Text>
+        </Text>
         {/* Submit Order Button */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmitOrder}>
           <Text style={styles.submitButtonText}>Submit Order</Text>

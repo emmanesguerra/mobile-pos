@@ -2,22 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SQLiteDatabase } from 'expo-sqlite';
 import OrderList from '@/components/POS/OrderList';
+import QuickList from '@/components/POS/QuickList';
 import { useSQLiteContext } from 'expo-sqlite';
 import { getNonBarcodedProducts } from '@/src/database/products';
-
-const mockOrders = [
-  { id: 1, name: 'Apple', quantity: 2, price: 10 },
-  { id: 2, name: 'Banana', quantity: 1, price: 5 },
-  { id: 3, name: 'Orange Juice', quantity: 1, price: 25 },
-  { id: 4, name: 'Apple', quantity: 2, price: 10 },
-  { id: 5, name: 'Banana', quantity: 1, price: 5 },
-];
+import { useSettingsContext } from '@/src/contexts/SettingsContext';
 
 export default function Pos() {
   const database = useSQLiteContext();
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState<any[]>([]);
   const [paidAmount, setPaidAmount] = useState(0);
   const [products, setProducts] = useState<any[]>([]);
+  const { productRefresh, setProductRefresh } = useSettingsContext();
 
   // Fetch products with isBarcoded = 0
   const fetchNonBarcodedProducts = async () => {
@@ -31,28 +26,57 @@ export default function Pos() {
 
   useEffect(() => {
     fetchNonBarcodedProducts();
-  }, []);
+    setProductRefresh(false);
+  }, [productRefresh, setProductRefresh]);
 
   const handleQuantityChange = (id: number, action: 'increment' | 'decrement') => {
-    setOrders((prevOrders) =>
-      prevOrders.map((item) =>
-        item.id === id
-          ? {
-            ...item,
-            quantity: action === 'increment' ? item.quantity + 1 : item.quantity > 1 ? item.quantity - 1 : 1,
-          }
-          : item
-      )
-    );
+    setOrders((prevOrders) => {
+      const updatedOrders = prevOrders
+        .map((item) =>
+          item.id === id
+            ? {
+              ...item,
+              quantity: action === 'increment' ? item.quantity + 1 : item.quantity > 1 ? item.quantity - 1 : 0,
+            }
+            : item
+        )
+        .filter((item) => item.quantity > 0); // Filter out items with quantity 0
+      return updatedOrders;
+    });
   };
 
   const total = orders.reduce((sum, item) => sum + item.quantity * item.price, 0);
-  const change = paidAmount - total > 0 ? paidAmount - total : 0;
+  const change = paidAmount - total;
 
   const handleSubmitOrder = () => {
     console.log('Order submitted:', { orders, paidAmount, total, change });
-    setOrders(mockOrders); // Reset to initial orders, or clear as needed
+    setOrders([]); // Reset to initial orders, or clear as needed
     setPaidAmount(0); // Reset paid amount
+  };
+
+  const handleClearOrder = () => {
+    setOrders([]); // Clear all orders  
+  };
+
+  // Add product to orders
+  const onAddToOrder = (product: any) => {
+    const existingOrder = orders.find((order) => order.code === product.product_code);
+    if (existingOrder) {
+      // If product already exists in orders, just increase the quantity
+      setOrders((prevOrders) =>
+        prevOrders.map((item) =>
+          item.code === product.product_code
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      // If product doesn't exist, add new order
+      setOrders((prevOrders) => [
+        ...prevOrders,
+        { id: Date.now(), code: product.product_code, name: product.product_name, quantity: 1, price: product.price },
+      ]);
+    }
   };
 
   return (
@@ -66,6 +90,7 @@ export default function Pos() {
           paidAmount={paidAmount}
           change={change}
           handleSubmitOrder={handleSubmitOrder}
+          handleClearOrder={handleClearOrder}
         />
 
         {/* Middle Pane - Placeholder */}
@@ -75,28 +100,7 @@ export default function Pos() {
         </View>
 
         {/* Right Pane - Custom Product List */}
-        <View style={styles.rightPane}>
-          {products.length === 0 ? (
-            <Text>No products available</Text>
-          ) : (
-            <View style={styles.buttonContainer}>
-              {products.map((product) => (
-                <TouchableOpacity
-                  key={product.id}
-                  style={styles.productButton}
-                  onPress={() => console.log('Selected product:', product)}
-                >
-                  <Text style={[styles.productButtonText, styles.productButtonTextName]}>
-                    {product.product_name}
-                  </Text>
-                  <Text style={[styles.productButtonText, styles.productButtonTextPrice]}>
-                    {product.price}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
+        <QuickList products={products} onAddToOrder={onAddToOrder} />
       </View>
     </View>
   );
@@ -138,30 +142,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',  // Allows wrapping of buttons in case of overflow
-    justifyContent: 'space-between', // Space out the buttons evenly
-  },
-  productButton: {
-    backgroundColor: '#4F6F52',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '30%',
-  },
-  productButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  productButtonTextName: {
-    fontSize: 12,
-  },
-  productButtonTextPrice: {
-    fontSize: 30,
   },
 });

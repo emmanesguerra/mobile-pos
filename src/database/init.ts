@@ -2,6 +2,7 @@ import { SQLiteDatabase } from 'expo-sqlite';
 
 export const initializeDatabase = async (database: SQLiteDatabase) => {
     try {
+
         await database.execAsync(
             `
             CREATE TABLE IF NOT EXISTS products (
@@ -60,5 +61,18 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
         console.log('DB tables created successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
+    }
+};
+
+export const dropDatabase = async (database: SQLiteDatabase) => {
+    try {
+        await database.execAsync(`DROP TABLE IF EXISTS order_items;`);
+        await database.execAsync(`DROP TABLE IF EXISTS orders;`);
+        await database.execAsync(`DROP TABLE IF EXISTS products;`);
+        await database.execAsync(`DROP TABLE IF EXISTS settings;`);
+
+        console.log('DB tables dropped successfully');
+    } catch (error) {
+        console.error('Error dropping database tables:', error);
     }
 };

@@ -36,11 +36,9 @@ export default function InventoryLists() {
       }
     };
 
+    fetchData();
     if (productRefresh) {
-      fetchData(); // Refetch products if productRefresh is true
-      setProductRefresh(false); // Reset product refresh state after fetching
-    } else {
-      fetchData(); // Normal fetch without refresh
+      setProductRefresh(false);
     }
   }, [searchQuery, itemsPerPage, currentPage, productRefresh, setProductRefresh]);
 
