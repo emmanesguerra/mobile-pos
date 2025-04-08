@@ -6,7 +6,6 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { getNonBarcodedProducts } from '@/src/database/products';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
 import NumericKeypad from '@/components/POS/NumericKeypad';
-import CameraComponent from '@/components/CameraComponent';
 
 export default function Pos() {
   const database = useSQLiteContext();
@@ -14,7 +13,6 @@ export default function Pos() {
   const [paidAmount, setPaidAmount] = useState(0);
   const [products, setProducts] = useState<any[]>([]);
   const { productRefresh, setProductRefresh } = useSettingsContext();
-  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
 
   // Fetch products with isBarcoded = 0
   const fetchNonBarcodedProducts = async () => {
@@ -92,11 +90,6 @@ export default function Pos() {
       });
     }
   };
-  
-  const handleBarcodeScanned = (barcodeData: string) => {
-    setScannedBarcode(barcodeData);  // Store the scanned barcode data
-    console.log("Received barcode data: ", barcodeData);
-  };
 
   return (
     <View style={styles.container}>
@@ -114,8 +107,6 @@ export default function Pos() {
 
         {/* Middle Pane */}
         <View style={styles.middlePane}>
-          {/* Camera Placeholder */}
-          <CameraComponent handleBarcodeScanned={handleBarcodeScanned} />
 
           {/* Numeric Keypad */}
           <NumericKeypad
