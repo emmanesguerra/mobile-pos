@@ -95,7 +95,7 @@ export default function TransactionLists() {
           <Fontisto name="preview" size={24} color="black" />
         </TouchableOpacity>
       ),
-      changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'green', fontWeight: 'bold' as 'bold' },
+      changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'transparent', fontWeight: 'bold' as 'bold' },
     }))
     .filter((order) => {
       if (filterType === 'negativeChange') {
@@ -159,7 +159,7 @@ export default function TransactionLists() {
             id: order.id,
             ref_no: order.ref_no,
             total: (
-              <Text>₱{order.total.toFixed(2)}</Text> // Apply red text style if negative
+              <Text style={{ color: 'green', fontWeight: 'bold' }}>₱{order.total.toFixed(2)}</Text> // Apply red text style if negative
             ),
             paidAmount: (
               <Text>₱{order.paidAmount.toFixed(2)}</Text> // Apply red text style if negative

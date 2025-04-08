@@ -87,3 +87,21 @@ export const insertProduct = async (
         console.error('Error inserting product:', error);
     }
 };
+
+export const updateProductQuantity = async (
+    database: SQLiteDatabase,
+    orderItems: { product_id: number; quantity: number }[]
+): Promise<boolean> => {
+    try {
+        for (const item of orderItems) {
+            await database.runAsync(
+                `UPDATE products SET stock = stock - ? WHERE id = ?`,
+                [item.quantity, item.product_id]
+            );
+        }
+        return true;
+    } catch (error) {
+        console.error('Error updating product quantity:', error);
+        return false;
+    }
+};

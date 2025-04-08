@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import OrderList from '@/components/POS/OrderList';
 import QuickList from '@/components/POS/QuickList';
 import { useSQLiteContext } from 'expo-sqlite';
-import { getNonBarcodedProducts } from '@/src/database/products';
+import { getNonBarcodedProducts, updateProductQuantity } from '@/src/database/products';
 import { insertOrder, insertOrderItems } from '@/src/database/orders';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
 import { generateRefNo } from '@/src/services/refNoService';
@@ -75,11 +75,13 @@ export default function Pos() {
 
       // Insert the order items
       await insertOrderItems(database, orderId, orderItems);
+      await updateProductQuantity(database, orderItems);
 
       console.log('Order successfully saved:', { orderId, orderItems });
 
       // Clear order state
       setOrderRefresh(true);
+      setProductRefresh(true);
       setOrders([]);
       setPaidAmount(0);
       alert('Order submitted successfully!');
