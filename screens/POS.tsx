@@ -14,7 +14,7 @@ export default function Pos() {
   const [orders, setOrders] = useState<any[]>([]);
   const [paidAmount, setPaidAmount] = useState(0);
   const [products, setProducts] = useState<any[]>([]);
-  const { productRefresh, setProductRefresh } = useSettingsContext();
+  const { productRefresh, setProductRefresh, orderRefresh, setOrderRefresh } = useSettingsContext();
 
   // Fetch products with isBarcoded = 0
   const fetchNonBarcodedProducts = async () => {
@@ -79,6 +79,7 @@ export default function Pos() {
       console.log('Order successfully saved:', { orderId, orderItems });
 
       // Clear order state
+      setOrderRefresh(true);
       setOrders([]);
       setPaidAmount(0);
       alert('Order submitted successfully!');

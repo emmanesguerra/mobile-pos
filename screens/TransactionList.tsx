@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { getOrders, getOrderItems } from '@/src/database/orders';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
+import { useSettingsContext } from '@/src/contexts/SettingsContext';
 
 export default function TransactionLists() {
   const database = useSQLiteContext();
   const [orders, setOrders] = useState<any[]>([]);
   const [orderItems, setOrderItems] = useState<any[]>([]);
+  const { itemsPerPage, orderRefresh, setOrderRefresh } = useSettingsContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +25,8 @@ export default function TransactionLists() {
     };
 
     fetchData();
-  }, []);
+    setOrderRefresh(false);
+  }, [itemsPerPage, orderRefresh, setOrderRefresh]);
 
   // Render each order
   const renderOrders = ({ item }: { item: any }) => (
