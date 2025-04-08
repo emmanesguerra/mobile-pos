@@ -23,8 +23,9 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
             `
             CREATE TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ref_code TEXT,
+                ref_no TEXT,
                 total REAL,
+                paidAmount REAL,
                 date TEXT DEFAULT CURRENT_TIMESTAMP
             );
             `

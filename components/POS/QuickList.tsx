@@ -43,7 +43,7 @@ const Quicklist: React.FC<QuicklistProps> = ({ products, onAddToOrder }) => {
 const styles = StyleSheet.create({
   rightPane: {
     flex: 1,
-    backgroundColor: '#fce4ec',
+    backgroundColor: '#fce4e7',
     padding: 10,
     borderRadius: 10,
     justifyContent: 'center',

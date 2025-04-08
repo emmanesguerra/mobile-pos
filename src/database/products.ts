@@ -23,8 +23,7 @@ export const getTotalProductsCount = async (database: SQLiteDatabase, searchTerm
     try {
         let query = `
             SELECT COUNT(*) as total FROM products
-            ${searchTerm ? 'WHERE product_name LIKE ?' : ''}
-            ORDER BY id DESC;
+            ${searchTerm ? 'WHERE product_name LIKE ?' : ''};
         `;
 
         const params = searchTerm ? [`%${searchTerm}%`] : [];

@@ -29,7 +29,7 @@ export default function TransactionLists() {
   const renderOrders = ({ item }: { item: any }) => (
     <View style={styles.item}>
       <Text style={styles.text}>Order ID: {item.id}</Text>
-      <Text style={styles.text}>Ref Code: {item.ref_code}</Text>
+      <Text style={styles.text}>Ref Code: {item.ref_no}</Text>
       <Text style={styles.text}>Total: ${item.total}</Text>
       <Text style={styles.text}>Date: {formatDate(item.date)}</Text>
     </View>

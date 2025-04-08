@@ -77,14 +77,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#624E88',
         borderRadius: 10,
-        padding: 5
+        padding: 5,
+        marginTop: 10
     },
     displayContainer: {
         flex: 1,
         padding: 10,
         margin: 5,
         backgroundColor: '#FFF',
-        marginBottom: 10,
+        marginBottom: 20,
         borderRadius: 10,
         alignItems: 'center',
     },

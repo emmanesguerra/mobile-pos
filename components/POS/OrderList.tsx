@@ -4,15 +4,11 @@ import { FlatList, Text, TouchableOpacity, View, StyleSheet } from 'react-native
 const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, handleSubmitOrder, handleClearOrder }: any) => {
   return (
     <View style={styles.leftPane}>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <TouchableOpacity style={styles.clearButton} onPress={handleClearOrder}>
-          <Text style={styles.clearButtonText}>Clear Items</Text>
-        </TouchableOpacity>
-      </View>
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id.toString()}
         style={styles.orderList}
+        showsVerticalScrollIndicator={true}
         renderItem={({ item }) => (
           <View style={styles.orderItem}>
             <View style={styles.itemInfo}>
@@ -41,19 +37,6 @@ const OrderList = ({ orders, handleQuantityChange, total, paidAmount, change, ha
       />
       {/* Order Summary */}
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ₱{total}</Text>
-        <Text style={styles.subtotalText}>
-          Change (₱{paidAmount} - ₱{total}) :
-          <Text
-            style={{
-              color: change < 0 ? '#F00' : '#008000',
-              fontWeight: 'bold',
-              fontSize: 20
-            }}
-          >
-            ₱{change}
-          </Text>
-        </Text>
         {/* Submit Order Button */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmitOrder}>
           <Text style={styles.submitButtonText}>Submit Order</Text>
@@ -114,9 +97,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   totalContainer: {
-    paddingTop: 10,
-    borderTopWidth: 2,
-    borderTopColor: '#000',
     marginTop: 10,
   },
   totalText: {
@@ -141,18 +121,6 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  clearButton: {
-    backgroundColor: '#A94A4A',
-    paddingVertical: 5,
-    borderRadius: 5,
-    alignItems: 'center',
-    width: 100,
-  },
-  clearButtonText: {
-    color: '#FFF',
-    fontSize: 12,
     fontWeight: 'bold',
   },
 });

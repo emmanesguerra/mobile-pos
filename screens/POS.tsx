@@ -4,7 +4,9 @@ import OrderList from '@/components/POS/OrderList';
 import QuickList from '@/components/POS/QuickList';
 import { useSQLiteContext } from 'expo-sqlite';
 import { getNonBarcodedProducts } from '@/src/database/products';
+import { insertOrder, insertOrderItems } from '@/src/database/orders';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
+import { generateRefNo } from '@/src/services/refNoService';
 import NumericKeypad from '@/components/POS/NumericKeypad';
 
 export default function Pos() {
@@ -48,14 +50,47 @@ export default function Pos() {
   const total = orders.reduce((sum, item) => sum + item.quantity * item.price, 0);
   const change = paidAmount - total;
 
-  const handleSubmitOrder = () => {
-    console.log('Order submitted:', { orders, paidAmount, total, change });
-    setOrders([]); // Reset to initial orders, or clear as needed
-    setPaidAmount(0); // Reset paid amount
+  const handleSubmitOrder = async () => {
+    if (orders.length === 0) {
+      alert('No items in the order.');
+      return;
+    }
+
+    try {
+      // Insert the main order and get the inserted order ID
+      const refNo = await generateRefNo(database);
+      const orderId = await insertOrder(database, refNo, total, paidAmount);
+      
+      if (!orderId) {
+        console.warn('Failed to insert order. Aborting order item insert.');
+        return;
+      }
+
+      // Map orders to orderItems with orderId
+      const orderItems = orders.map((item) => ({
+        product_id: item.code,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      // Insert the order items
+      await insertOrderItems(database, orderId, orderItems);
+
+      console.log('Order successfully saved:', { orderId, orderItems });
+
+      // Clear order state
+      setOrders([]);
+      setPaidAmount(0);
+      alert('Order submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      alert('Failed to submit order. Please try again.');
+    }
   };
 
   const handleClearOrder = () => {
-    setOrders([]); // Clear all orders  
+    setOrders([]);
+    setPaidAmount(0);
   };
 
   // Add product to orders
@@ -108,6 +143,31 @@ export default function Pos() {
         {/* Middle Pane */}
         <View style={styles.middlePane}>
 
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity style={styles.clearButton} onPress={handleClearOrder}>
+              <Text style={styles.clearButtonText}>Clear Items</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryBox}>
+              <Text style={styles.summaryLabel}>Total Price</Text>
+              <Text style={styles.summaryLabel}></Text>
+              <Text style={styles.summaryValue}>
+                <Text style={styles.currencySymbol}>₱</Text>
+                <Text style={styles.summaryValuePrice}>{total}</Text>
+              </Text>
+            </View>
+            <View style={styles.summaryBox}>
+              <Text style={styles.summaryLabel}>Change</Text>
+              <Text style={styles.summaryLabel}>(₱{paidAmount} - ₱{total})</Text>
+              <Text style={styles.summaryValue}>
+                <Text style={styles.currencySymbol}>₱</Text>
+                <Text style={[styles.summaryValuePrice, { color: change < 0 ? '#F00' : '#008000' }]}>{change}</Text>
+              </Text>
+            </View>
+          </View>
+
+
           {/* Numeric Keypad */}
           <NumericKeypad
             handleNumericInput={handleNumericInput}
@@ -143,20 +203,60 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffebee',
     padding: 10,
     borderRadius: 10,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  cameraBox: {
-    width: '100%',
-    height: 100,
-    backgroundColor: '#ddd',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderRadius: 10,
+
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    padding: 10,
   },
-  cameraText: {
+
+  summaryBox: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 2,
+  },
+  summaryLabel: {
     fontSize: 16,
-    color: '#333',
+    fontWeight: 'bold',
+  },
+
+  summaryValue: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+
+  currencySymbol: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    alignSelf: 'flex-start',
+  },
+
+  summaryValuePrice: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginLeft: 5,
+    alignSelf: 'flex-start',
+  },
+  clearButton: {
+    backgroundColor: '#A94A4A',
+    paddingVertical: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    padding: 10,
+    width: '100%',
+  },
+  clearButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
