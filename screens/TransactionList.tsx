@@ -9,6 +9,7 @@ import { useSettingsContext } from '@/src/contexts/SettingsContext';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import ModalComponent from '@/components/ModalComponent';
 import OrderComponent from '@/components/Order/OrderComponent';
+import { Picker } from '@react-native-picker/picker';
 
 
 export default function TransactionLists() {
@@ -23,6 +24,7 @@ export default function TransactionLists() {
   const { itemsPerPage, orderRefresh, setOrderRefresh } = useSettingsContext();
   const [paidAmount, setPaidAmount] = useState(0);
   const [note, setNote] = useState("");
+  const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,8 +78,38 @@ export default function TransactionLists() {
     { field: 'ref_no', label: 'Reference Number' },
     { field: 'total', label: 'Total Amount (₱)' },
     { field: 'paidAmount', label: 'Paid Amount (₱)' },
+    { field: 'change', label: 'Change Amount (₱)' },
     { field: 'actions', label: 'Actions' },
   ];
+
+  const filteredOrders = orders
+    .map((order) => ({
+      id: order.id,
+      ref_no: order.ref_no,
+      total: order.total,
+      paidAmount: order.paidAmount,
+      change: order.paidAmount - order.total,
+      date: formatDate(order.created_at),
+      actions: (
+        <TouchableOpacity onPress={() => handleViewOrder(order)}>
+          <Fontisto name="preview" size={24} color="black" />
+        </TouchableOpacity>
+      ),
+      changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'green', fontWeight: 'bold' as 'bold' },
+    }))
+    .filter((order) => {
+      if (filterType === 'negativeChange') {
+        return order.change < 0;
+      } else if (filterType === 'positiveChange') {
+        return order.change > 0;
+      } else {
+        return true;
+      }
+    });
+
+  const handleFilterChange = (type: string) => {
+    setFilterType(type);
+  };
 
   const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
@@ -101,7 +133,6 @@ export default function TransactionLists() {
     <View style={styles.container}>
       <View style={styles.innerContainer}>
 
-
         <View style={styles.searchAndButtons}>
           <TextInput
             style={styles.searchInput}
@@ -109,22 +140,35 @@ export default function TransactionLists() {
             value={searchQuery}
             onChangeText={handleSearchChange}
           />
+
+          <Picker
+            selectedValue={filterType}
+            style={styles.picker}
+            onValueChange={(itemValue) => setFilterType(itemValue)}
+          >
+            <Picker.Item label="Display All" value="all" />
+            <Picker.Item label="Excess Payment" value="positiveChange" />
+            <Picker.Item label="Insufficient Payment" value="negativeChange" />
+          </Picker>
         </View>
 
         {/* Table for Orders */}
         <TableComponent
           headers={orderHeaders}
-          data={orders.map((order) => ({
+          data={filteredOrders.map((order) => ({
             id: order.id,
             ref_no: order.ref_no,
-            total: order.total,
-            paidAmount: order.paidAmount,
-            date: formatDate(order.created_at),
-            actions: (
-              <TouchableOpacity onPress={() => handleViewOrder(order)}>
-                <Fontisto name="preview" size={24} color="black" />
-              </TouchableOpacity>
+            total: (
+              <Text>₱{order.total.toFixed(2)}</Text> // Apply red text style if negative
             ),
+            paidAmount: (
+              <Text>₱{order.paidAmount.toFixed(2)}</Text> // Apply red text style if negative
+            ),
+            change: (
+              <Text style={order.changeStyle}>₱{order.change.toFixed(2)}</Text>
+            ),
+            date: order.date,
+            actions: order.actions,
           }))}
         />
 
@@ -218,5 +262,9 @@ const styles = StyleSheet.create({
   tableContainer: {
     flex: 1,
     padding: 0,
+  },
+  picker: {
+    width: 300,
+    marginLeft: 10,
   },
 });

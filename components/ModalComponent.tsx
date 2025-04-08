@@ -86,11 +86,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#27548A',
-    marginRight: 10, // Add some space between the buttons
+    marginRight: 10,
+    width: 100
   },
   buttonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
   },
