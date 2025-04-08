@@ -68,7 +68,7 @@ export default function Pos() {
 
       // Map orders to orderItems with orderId
       const orderItems = orders.map((item) => ({
-        product_id: item.code,
+        product_id: item.id,
         quantity: item.quantity,
         price: item.price,
       }));
@@ -110,7 +110,7 @@ export default function Pos() {
       // If product doesn't exist, add new order
       setOrders((prevOrders) => [
         ...prevOrders,
-        { id: Date.now(), code: product.product_code, name: product.product_name, quantity: 1, price: product.price },
+        { id: product.id, code: product.product_code, name: product.product_name, quantity: 1, price: product.price },
       ]);
     }
   };

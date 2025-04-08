@@ -26,7 +26,9 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
                 ref_no TEXT,
                 total REAL,
                 paidAmount REAL,
-                date TEXT DEFAULT CURRENT_TIMESTAMP
+                note TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             );
             `
         );

@@ -7,6 +7,7 @@ interface ModalComponentProps {
   children: React.ReactNode;
   onClose: () => void;
   onPrint?: () => void;
+  onSave?: () => void;
 }
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
@@ -15,6 +16,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   children,
   onClose,
   onPrint,
+  onSave,
 }) => {
   return (
     <Modal visible={isVisible} animationType="slide" transparent={true} onRequestClose={onClose}>
@@ -26,14 +28,22 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           {children}
 
           <View style={styles.buttonGroup}>
-            <TouchableOpacity style={[styles.button, { marginRight: 20, backgroundColor: 'gray' }]} onPress={onClose}>
+            <View style={styles.leftButtons}>
+              {onPrint && (
+                <TouchableOpacity style={[styles.button]} onPress={onPrint}>
+                  <Text style={styles.buttonText}>Print</Text>
+                </TouchableOpacity>
+              )}
+              {onSave && (
+                <TouchableOpacity style={[styles.button, { backgroundColor: 'green' }]} onPress={onSave}>
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <TouchableOpacity style={[styles.button, { backgroundColor: 'gray' }]} onPress={onClose}>
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
-            {onPrint && (
-              <TouchableOpacity style={[styles.button]} onPress={onPrint}>
-                <Text style={styles.buttonText}>Print</Text>
-              </TouchableOpacity>
-            )}
           </View>
         </View>
       </View>
@@ -58,12 +68,16 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: 'center',
   },
   buttonGroup: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+  },
+  leftButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   button: {
     paddingVertical: 10,
@@ -72,7 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#27548A',
-    marginTop: 20,
+    marginRight: 10, // Add some space between the buttons
   },
   buttonText: {
     color: '#fff',

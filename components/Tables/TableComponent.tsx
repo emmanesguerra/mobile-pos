@@ -33,12 +33,17 @@ const TableComponent: React.FC<TableComponentProps> = ({ headers, data }) => {
             </View>
 
             {/* Render Table Rows with FlatList */}
-            <FlatList
-                data={data}
-                renderItem={renderRow}
-                keyExtractor={(item, index) => item.id.toString() || index.toString()}
-                showsVerticalScrollIndicator={false}
-            />
+            {data.length === 0 ? (
+                <Text style={styles.noDataText}>No data available</Text>
+            ) : (
+                // Render Table Rows with FlatList
+                <FlatList
+                    data={data}
+                    renderItem={renderRow}
+                    keyExtractor={(item, index) => item.id.toString() || index.toString()}
+                    showsVerticalScrollIndicator={false}
+                />
+            )}
         </View>
     );
 };
@@ -51,6 +56,7 @@ const formatDate = (date: string) => {
 const styles = StyleSheet.create({
     tableContainer: {
         marginTop: 5,
+        marginBottom: 10,
         maxHeight: '80%',
     },
     tableHeader: {
@@ -76,6 +82,12 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: 'center',
         fontSize: 16,
+    },
+    noDataText: {
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#888',
+        marginTop: 20,
     },
 });
 

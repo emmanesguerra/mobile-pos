@@ -20,14 +20,20 @@ export const getOrders = async (database: SQLiteDatabase, searchTerm: string = '
     }
 };
 
-export const getOrderItems = async (database: SQLiteDatabase): Promise<any[]> => {
+export const getOrderItems = async (database: SQLiteDatabase, orderId: number): Promise<any[]> => {
     try {
+        // Fetch order items and join with the products table to get product details
         const result = await database.getAllAsync(
-            `SELECT * FROM order_items ORDER BY id DESC;`
+            `SELECT oi.id, oi.product_id, p.product_name, oi.price, oi.quantity
+                FROM order_items oi
+                LEFT JOIN products p ON oi.product_id = p.id
+                WHERE oi.order_id = ?
+                ORDER BY oi.id DESC;`,
+            [orderId] // Parameterized query to safely insert orderId
         );
         return result;
     } catch (error) {
-        console.error('Error fetching sales records:', error);
+        console.error('Error fetching order items:', error);
         return [];
     }
 };
@@ -89,6 +95,34 @@ export const insertOrderItems = async (
         return true;
     } catch (error) {
         console.error('Error inserting order items:', error);
+        return false;
+    }
+};
+
+export const updateOrder = async (
+    database: SQLiteDatabase,
+    orderId: number,
+    paidAmount: number,
+    note: string
+): Promise<boolean> => {
+    try {
+        // SQL query to update the paidAmount, note, and updated_at fields
+        const result = await database.runAsync(
+            `UPDATE orders 
+         SET paidAmount = ?, note = ?, updated_at = CURRENT_TIMESTAMP 
+         WHERE id = ?;`,
+            [paidAmount, note, orderId]
+        );
+
+        if (result.changes > 0) {
+            console.log('Order updated successfully.');
+            return true;
+        } else {
+            console.log('No changes were made.');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error updating order:', error);
         return false;
     }
 };
