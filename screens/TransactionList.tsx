@@ -1,71 +1,97 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { getOrders, getOrderItems } from '@/src/database/orders';
+import { getOrders, getOrderItems, getTotalOrders } from '@/src/database/orders';
 import { useSQLiteContext } from 'expo-sqlite';
 import { formatDate } from '@/src/services/dateService';
+import TableComponent from '@/components/Tables/TableComponent';
+import PaginationControls from '@/components/Tables/PaginationControls';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
 
 export default function TransactionLists() {
   const database = useSQLiteContext();
   const [orders, setOrders] = useState<any[]>([]);
   const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
   const { itemsPerPage, orderRefresh, setOrderRefresh } = useSettingsContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedOrders = await getOrders(database);
-        const fetchedOrderItems = await getOrderItems(database);
+        const offset = (currentPage - 1) * itemsPerPage;
 
+        // Fetch orders based on pagination and search query
+        const fetchedOrders = await getOrders(database, searchQuery, itemsPerPage, offset);
         setOrders(fetchedOrders);
-        setOrderItems(fetchedOrderItems);
+
+        // Get the total number of orders to calculate total pages
+        const fetchedTotalOrders = await getTotalOrders(database, searchQuery);
+        setTotalOrders(fetchedTotalOrders);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-    setOrderRefresh(false);
-  }, [itemsPerPage, orderRefresh, setOrderRefresh]);
+    if (orderRefresh) {
+      setOrderRefresh(false);
+    }
+  }, [searchQuery, itemsPerPage, currentPage, orderRefresh, setOrderRefresh]);
 
-  // Render each order
-  const renderOrders = ({ item }: { item: any }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>Order ID: {item.id}</Text>
-      <Text style={styles.text}>Ref Code: {item.ref_no}</Text>
-      <Text style={styles.text}>Total: ${item.total}</Text>
-      <Text style={styles.text}>Date: {formatDate(item.date)}</Text>
-    </View>
-  );
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to page 1 whenever search query changes
+  };
 
-  // Render each order item
-  const renderOrderItem = ({ item }: { item: any }) => (
-    <View style={styles.item}>
-      <Text style={styles.text}>Order Item ID: {item.id}</Text>
-      <Text style={styles.text}>Order ID: {item.order_id}</Text>
-      <Text style={styles.text}>Product ID: {item.product_id}</Text>
-      <Text style={styles.text}>Quantity: {item.quantity}</Text>
-      <Text style={styles.text}>Price: ${item.price}</Text>
-    </View>
-  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const orderHeaders = [
+    { field: 'date', label: 'Order Date' },
+    { field: 'ref_no', label: 'Reference Number' },
+    { field: 'total', label: 'Total Amount (₱)' },
+    { field: 'paidAmount', label: 'Paid Amount (₱)' },
+  ];
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalOrders / itemsPerPage);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Transaction List</Text>
+      <View style={styles.innerContainer}>
 
-      <Text style={styles.sectionTitle}>Orders</Text>
-      <FlatList
-        data={orders}
-        renderItem={renderOrders}
-        keyExtractor={(item) => item.id.toString()}
-      />
 
-      <Text style={styles.sectionTitle}>Order Items</Text>
-      <FlatList
-        data={orderItems}
-        renderItem={renderOrderItem}
-        keyExtractor={(item) => item.id.toString()}
-      />
+        <View style={styles.searchAndButtons}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search orders..."
+            value={searchQuery}
+            onChangeText={handleSearchChange}
+          />
+        </View>
+
+        {/* Table for Orders */}
+        <TableComponent
+          headers={orderHeaders}
+          data={orders.map((order) => ({
+            id: order.id,
+            ref_no: order.ref_no,
+            total: order.total,
+            paidAmount: order.paidAmount,
+            date: formatDate(order.date), // Format the date as needed
+          }))}
+        />
+
+        {/* Pagination Controls */}
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </View>
     </View>
   );
 }
@@ -74,27 +100,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#046582',
+  },
+  innerContainer: {
+    flex: 1,
+    padding: 30,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    elevation: 5,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 20,
+  searchAndButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  item: {
-    marginBottom: 15,
-    padding: 10,
+  searchInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-  },
-  text: {
+    paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333',
+    flex: 1,
   },
 });

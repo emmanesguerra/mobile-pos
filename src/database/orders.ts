@@ -1,14 +1,21 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 
 // Get all sales records
-export const getOrders = async (database: SQLiteDatabase): Promise<any[]> => {
+export const getOrders = async (database: SQLiteDatabase, searchTerm: string = '', limit: number, offset: number): Promise<any[]> => {
     try {
-        const result = await database.getAllAsync(
-            `SELECT * FROM orders ORDER BY id DESC;`
-        );
+        let query = `
+            SELECT * FROM orders
+            ${searchTerm ? 'WHERE ref_no LIKE ?' : ''}
+            ORDER BY id DESC
+            LIMIT ? OFFSET ?;
+        `;
+
+        const params = searchTerm ? [`%${searchTerm}%`, limit, offset] : [limit, offset];
+
+        const result = await database.getAllAsync(query, params);
         return result;
     } catch (error) {
-        console.error('Error fetching sales records:', error);
+        console.error('Error fetching products:', error);
         return [];
     }
 };
@@ -29,7 +36,7 @@ export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: strin
     try {
         let query = `
             SELECT COUNT(*) as total FROM orders
-            ${searchTerm ? 'WHERE ref_code LIKE ?' : ''};
+            ${searchTerm ? 'WHERE ref_no LIKE ?' : ''};
         `;
 
         const params = searchTerm ? [`%${searchTerm}%`] : [];

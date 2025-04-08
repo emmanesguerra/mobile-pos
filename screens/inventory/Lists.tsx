@@ -63,7 +63,7 @@ export default function InventoryLists() {
   };
 
   const inventoryHeaders = [
-    { field: 'updated_at', label: 'Date Updated' },
+    { field: 'updated_at', label: 'Updated Date' },
     { field: 'product_code', label: 'Product Code' },
     { field: 'product_name', label: 'Product Name' },
     { field: 'stock', label: 'Stock' },
