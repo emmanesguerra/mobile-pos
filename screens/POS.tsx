@@ -154,15 +154,13 @@ export default function Pos() {
           <View style={styles.summaryContainer}>
             <View style={styles.summaryBox}>
               <Text style={styles.summaryLabel}>Total Price</Text>
-              <Text style={styles.summaryLabel}></Text>
               <Text style={styles.summaryValue}>
                 <Text style={styles.currencySymbol}>₱</Text>
                 <Text style={styles.summaryValuePrice}>{total}</Text>
               </Text>
             </View>
             <View style={styles.summaryBox}>
-              <Text style={styles.summaryLabel}>Change</Text>
-              <Text style={styles.summaryLabel}>(₱{paidAmount} - ₱{total})</Text>
+              <Text style={styles.summaryLabel}>Change ({paidAmount} - {total})</Text>
               <Text style={styles.summaryValue}>
                 <Text style={styles.currencySymbol}>₱</Text>
                 <Text style={[styles.summaryValuePrice, { color: change < 0 ? '#F00' : '#008000' }]}>{change}</Text>
@@ -220,14 +218,14 @@ const styles = StyleSheet.create({
   summaryBox: {
     flex: 1,
     backgroundColor: '#FFF',
-    padding: 10,
+    padding: 5,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 2,
   },
   summaryLabel: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 
@@ -244,7 +242,7 @@ const styles = StyleSheet.create({
   },
 
   summaryValuePrice: {
-    fontSize: 40,
+    fontSize: 35,
     fontWeight: 'bold',
     marginLeft: 5,
     alignSelf: 'flex-start',

@@ -53,8 +53,7 @@ export const getNonBarcodedProducts = async (database: SQLiteDatabase): Promise<
         const query = `
             SELECT * FROM products
             WHERE isBarcoded = 0
-            ORDER BY id DESC
-            LIMIT 10;
+            ORDER BY id DESC;
         `;
 
         const result = await database.getAllAsync(query);

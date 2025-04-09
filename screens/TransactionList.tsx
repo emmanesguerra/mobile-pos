@@ -76,8 +76,8 @@ export default function TransactionLists() {
   const orderHeaders = [
     { field: 'date', label: 'Order Date' },
     { field: 'ref_no', label: 'Reference Number' },
-    { field: 'total', label: 'Total Amount (₱)' },
     { field: 'paidAmount', label: 'Paid Amount (₱)' },
+    { field: 'total', label: 'Total Amount (₱)' },
     { field: 'change', label: 'Change Amount (₱)' },
     { field: 'actions', label: 'Actions' },
   ];
@@ -95,7 +95,7 @@ export default function TransactionLists() {
           <Fontisto name="preview" size={24} color="black" />
         </TouchableOpacity>
       ),
-      changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'transparent', fontWeight: 'bold' as 'bold' },
+      changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'green', fontWeight: 'bold' as 'bold' },
     }))
     .filter((order) => {
       if (filterType === 'negativeChange') {
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   searchInput: {
     borderWidth: 1,

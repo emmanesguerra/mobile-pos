@@ -41,7 +41,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ headers, data }) => {
                     data={data}
                     renderItem={renderRow}
                     keyExtractor={(item, index) => item.id.toString() || index.toString()}
-                    showsVerticalScrollIndicator={false}
+                    showsVerticalScrollIndicator={true}
                 />
             )}
         </View>
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     tableContainer: {
         marginTop: 5,
         marginBottom: 10,
-        maxHeight: '80%',
+        height: '80%',
     },
     tableHeader: {
         flexDirection: 'row',
@@ -69,23 +69,24 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: 'center',
         color: '#FFF',
-        fontSize: 18,
+        fontSize: 14,
     },
     tableRow: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        borderTopWidth: 0,
+        borderWidth: 1,
+        borderColor: '#ccc',
         paddingVertical: 12,
         paddingHorizontal: 15,
     },
     tableCell: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 16,
+        fontSize: 12,
     },
     noDataText: {
         textAlign: 'center',
-        fontSize: 16,
+        fontSize: 12,
         color: '#888',
         marginTop: 20,
     },

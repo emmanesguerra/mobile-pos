@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
 interface Product {
   id: number;
@@ -24,7 +25,7 @@ const Quicklist: React.FC<QuicklistProps> = ({ products, onAddToOrder }) => {
             <TouchableOpacity
               key={product.id}
               style={[styles.productButton, { backgroundColor: product.bgColor }]}
-              onPress={() => onAddToOrder(product)} 
+              onPress={() => onAddToOrder(product)}
             >
               <Text style={[styles.productButtonText, styles.productButtonTextName]}>
                 {product.product_name}
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   productButtonTextPrice: {
-    fontSize: 30,
+    fontSize: 25,
   },
 });
 

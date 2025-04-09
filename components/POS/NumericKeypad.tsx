@@ -78,14 +78,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#624E88',
         borderRadius: 10,
         padding: 5,
-        marginTop: 10
     },
     displayContainer: {
         flex: 1,
         padding: 10,
         margin: 5,
         backgroundColor: '#FFF',
-        marginBottom: 20,
         borderRadius: 10,
         alignItems: 'center',
     },
@@ -101,7 +99,7 @@ const styles = StyleSheet.create({
     },
     keyButton: {
         flex: 1,
-        height: 60,
+        height: 59,
         margin: 5,
         backgroundColor: '#8967B3',
         justifyContent: 'center',

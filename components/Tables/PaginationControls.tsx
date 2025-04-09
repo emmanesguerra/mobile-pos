@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 5,
     },
     button: {
         paddingVertical: 10,
@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     pageNumber: {
-        fontSize: 16,
+        fontSize: 12,
     },
 });
