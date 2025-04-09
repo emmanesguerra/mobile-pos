@@ -76,6 +76,12 @@ export default function Layout() {
                 drawerItemStyle: { display: "none" }
               }} />
             <Drawer.Screen
+              name="[id]"
+              options={{
+                title: "Update Product Form",
+                drawerItemStyle: { display: "none" }
+              }} />
+            <Drawer.Screen
               name="sync"
               options={{
                 title: "Sync Data",

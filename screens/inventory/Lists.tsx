@@ -8,9 +8,12 @@ import TableComponent from '@/components/Tables/TableComponent';
 import PaginationControls from '@/components/Tables/PaginationControls';
 import ModalComponent from '@/components/ModalComponent';
 import { useSettingsContext } from '@/src/contexts/SettingsContext';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { useRouter } from 'expo-router';
 
 export default function InventoryLists() {
   const database = useSQLiteContext();
+  const router = useRouter();
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +70,8 @@ export default function InventoryLists() {
     { field: 'product_code', label: 'Product Code' },
     { field: 'product_name', label: 'Product Name' },
     { field: 'stock', label: 'Stock' },
-    { field: 'price', label: 'Price (₱)' }
+    { field: 'price', label: 'Price (₱)' },
+    { field: 'action', label: 'Action' }
   ];
 
   const lowStockHeaders = [
@@ -78,6 +82,10 @@ export default function InventoryLists() {
 
   // Calculate total pages
   const totalPages = Math.ceil(totalProducts / itemsPerPage);
+
+  const goToEditForm = (id: number) => {
+    router.push(`/${id}`);
+  };
 
   return (
     <View style={styles.container}>
@@ -109,6 +117,11 @@ export default function InventoryLists() {
             stock: product.stock,
             price: product.price,
             id: product.id,
+            action: (
+              <TouchableOpacity onPress={() => goToEditForm(product.id)}>
+                <AntDesign name="edit" size={24} color="black" />
+              </TouchableOpacity>
+            ),
           }))}
         />
 

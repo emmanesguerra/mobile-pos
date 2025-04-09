@@ -1,5 +1,15 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 
+export type Product = {
+    id: number;
+    product_code: string;
+    product_name: string;
+    price: number;
+    stock: number;
+    isBarcoded: number; // or boolean, depending on your logic
+    bgColor?: string | null;
+};
+
 // Get products with optional search and pagination
 export const getProducts = async (database: SQLiteDatabase, searchTerm: string = '', limit: number, offset: number): Promise<any[]> => {
     try {
@@ -35,6 +45,15 @@ export const getTotalProductsCount = async (database: SQLiteDatabase, searchTerm
         return 0;
     }
 };
+
+export const getProductById = async (database: SQLiteDatabase, id: number): Promise<Product | undefined> => {
+    const result = await database.getFirstAsync(
+        'SELECT * FROM products WHERE id = ?',
+        [id]
+    );
+
+    return result as Product | undefined;
+}
 
 export const getLowStockProducts = async (database: SQLiteDatabase, threshold: number, searchTerm: string = ''): Promise<any[]> => {
     try {
@@ -87,6 +106,41 @@ export const insertProduct = async (
     }
 };
 
+export const updateProduct = async (
+    database: SQLiteDatabase,
+    id: number,
+    productName: string,
+    stock: number,
+    price: number,
+    bgColor: string
+): Promise<boolean> => {
+    try {
+        // SQL query to update the product details
+        const query = `
+        UPDATE products
+        SET 
+          product_name = ?, 
+          stock = ?, 
+          price = ?, 
+          bgColor = ?, 
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?`;
+
+        // Execute the query with the provided values
+        await database.runAsync(query, [
+            productName,
+            stock,
+            price,
+            bgColor,
+            id,
+        ]);
+
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
+
 export const updateProductQuantity = async (
     database: SQLiteDatabase,
     orderItems: { product_id: number; quantity: number }[]
@@ -100,7 +154,6 @@ export const updateProductQuantity = async (
         }
         return true;
     } catch (error) {
-        console.error('Error updating product quantity:', error);
         return false;
     }
 };

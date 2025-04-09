@@ -11,7 +11,7 @@ const ProductForm = ({
     onSubmit,
     withCamera
 }: any) => {
-    const [selectedBgColor, setSelectedBgColor] = useState(formData.bgColor || '#9FB3DF');
+    const [selectedBgColor, setSelectedBgColor] = useState(formData.bgColor || '#FFF');
     const colorOptions = [
         '#9FB3DF',
         '#9EC6F3',
@@ -31,7 +31,6 @@ const ProductForm = ({
     };
 
     const handleColorSelection = (color: string) => {
-        setSelectedBgColor(color);
         setFormData((prev: any) => ({
             ...prev,
             bgColor: color,
@@ -43,7 +42,7 @@ const ProductForm = ({
             <View style={styles.formContainer}>
                 <Text style={styles.title}>{title}</Text>
 
-                {fields.map(({ key, placeholder, keyboardType }: any) => {
+                {fields.map(({ key, placeholder, keyboardType, disabled }: any) => {
                     if (keyboardType === 'picker') {
                         return (
                             <View key={key} style={styles.pickerContainer}>
@@ -56,7 +55,7 @@ const ProductForm = ({
                                             style={[styles.colorCircle, { backgroundColor: color }]}
                                             onPress={() => handleColorSelection(color)}
                                         >
-                                            {selectedBgColor === color && (
+                                            {formData.bgColor === color && (
                                                 <View style={styles.selectedIndicator} />
                                             )}
                                         </TouchableOpacity>
@@ -69,11 +68,15 @@ const ProductForm = ({
                     return (
                         <TextInput
                             key={key}
-                            style={styles.input}
+                            style={[
+                              styles.input,
+                              { backgroundColor: disabled === undefined ? 'transparent' : disabled ? '#D3D3D3' : 'transparent' }
+                            ]}
                             placeholder={placeholder}
                             keyboardType={keyboardType}
                             value={formData[key]}
                             onChangeText={(text) => handleChange(key, text)}
+                            editable={disabled === undefined ? true : !disabled}
                         />
                     );
                 })}
