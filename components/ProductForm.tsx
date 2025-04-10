@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Button, TouchableOpacity } from 'react-native';
+import AntDesign from '@expo/vector-icons/AntDesign'; // Make sure to import the icon
 
 const ProductForm = ({
     title,
@@ -37,6 +38,13 @@ const ProductForm = ({
         }));
     };
 
+    const handleClearInput = (key: string) => {
+        setFormData((prev: any) => ({
+            ...prev,
+            [key]: '', // Clear the specific field
+        }));
+    };
+
     return (
         <View style={[styles.outerContainer, { backgroundColor }]}>
             <View style={styles.formContainer}>
@@ -66,18 +74,27 @@ const ProductForm = ({
                     }
 
                     return (
-                        <TextInput
-                            key={key}
-                            style={[
-                              styles.input,
-                              { backgroundColor: disabled === undefined ? 'transparent' : disabled ? '#D3D3D3' : 'transparent' }
-                            ]}
-                            placeholder={placeholder}
-                            keyboardType={keyboardType}
-                            value={formData[key]}
-                            onChangeText={(text) => handleChange(key, text)}
-                            editable={disabled === undefined ? true : !disabled}
-                        />
+                        <View key={key} style={styles.inputWrapper}>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    {
+                                        backgroundColor: disabled === undefined ? 'transparent' : disabled ? '#D3D3D3' : 'transparent',
+                                    },
+                                ]}
+                                placeholder={placeholder}
+                                keyboardType={keyboardType}
+                                value={formData[key]}
+                                onChangeText={(text) => handleChange(key, text)}
+                                editable={disabled === undefined ? true : !disabled}
+                            />
+
+                            {formData[key] ? (
+                                <TouchableOpacity onPress={() => handleClearInput(key)} style={styles.clearButton}>
+                                    <AntDesign name="closecircle" size={20} color="#888" />
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
                     );
                 })}
 
@@ -107,6 +124,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
     },
+    inputWrapper: {
+        position: 'relative',
+        marginBottom: 10,
+    },
     input: {
         height: 50,
         borderWidth: 1,
@@ -114,6 +135,12 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 10,
         marginBottom: 10,
+    },
+    clearButton: {
+        position: 'absolute',
+        right: 10,
+        top: '50%',
+        transform: [{ translateY: -12 }],
     },
     pickerContainer: {
         marginBottom: 10,

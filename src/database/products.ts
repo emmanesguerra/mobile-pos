@@ -94,16 +94,12 @@ export const insertProduct = async (
     bgColor: string
 ) => {
     try {
-        console.log('Inserting product:');
-
         await database.runAsync(
             'INSERT INTO products (product_code, product_name, stock, price, isBarcoded, bgColor) VALUES (?, ?, ?, ?, ?, ?);',
             [productCode, productName, stock, price, isBarcoded, bgColor]
         );
-
-        console.log('Product inserted successfully!');
     } catch (error) {
-        console.error('Error inserting product:', error);
+        throw error;
     }
 };
 

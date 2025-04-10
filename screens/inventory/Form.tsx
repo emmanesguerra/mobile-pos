@@ -22,7 +22,7 @@ export default function InventoryForm() {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const database = useSQLiteContext();
-  const { setProductRefresh } = useSettingsContext(); 
+  const { setProductRefresh } = useSettingsContext();
 
   const [barcodedForm, setBarcodedForm] = useState({ code: '', name: '', price: '', stock: '' });
   const [generalForm, setGeneralForm] = useState({ name: '', price: '', bgColor: '' });
@@ -50,6 +50,16 @@ export default function InventoryForm() {
     try {
       const { code, name, price, stock, bgColor } = formData;
 
+      if (isBarcoded && !code.trim()) {
+        alert("Product code is required for barcoded products.");
+        return;
+      }
+      
+      if (!name.trim()) {
+        alert("Product name is required.");
+        return;
+      }
+
       const productCode = isBarcoded ? code : generateCodeFromNameAndTimestamp(name);
       const productName = name;
       const productPrice = parseFloat(price);
@@ -57,23 +67,32 @@ export default function InventoryForm() {
       const productIsBarcoded = isBarcoded ? 1 : 0;
       const productBgColor = isBarcoded ? "" : bgColor;
 
-      await insertProduct(
-        database,
-        productCode,
-        productName,
-        productStock,
-        productPrice,
-        productIsBarcoded,
-        productBgColor
-      );
+      try {
+        await insertProduct(
+          database,
+          productCode,
+          productName,
+          productStock,
+          productPrice,
+          productIsBarcoded,
+          productBgColor
+        );
+      } catch (insertError) {
+        alert(`Failed to add product. The code "${productCode}" might already be used.`);
+        return;
+      }
 
       setProductRefresh(true);
 
-      alert( `Product ${productName} addedd successfully!`);
+      if (isBarcoded) {
+        setBarcodedForm({ code: '', name: '', price: '', stock: '' });
+      } else {
+        setGeneralForm({ name: '', price: '', bgColor: '' });
+      }
 
-      console.log("Product added:", formData);
+      alert(`Product ${productName} added successfully!`);
     } catch (error) {
-      console.error("Error handling submit:", error);
+      alert("An unexpected error occurred while adding the product.");
     }
   };
 
