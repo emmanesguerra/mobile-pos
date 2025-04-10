@@ -1,138 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import OrderList from '@/components/POS/OrderList';
 import QuickList from '@/components/POS/QuickList';
-import { useSQLiteContext } from 'expo-sqlite';
-import { getNonBarcodedProducts, updateProductQuantity } from '@/src/database/products';
-import { insertOrder, insertOrderItems } from '@/src/database/orders';
-import { useSettingsContext } from '@/src/contexts/SettingsContext';
-import { generateRefNo } from '@/src/services/refNoService';
 import NumericKeypad from '@/components/POS/NumericKeypad';
+import { useOrders } from '@/src/hooks/POS/useOrders';
+import { useProducts } from '@/src/hooks/POS/useProducts';
 
 export default function Pos() {
-  const database = useSQLiteContext();
-  const [orders, setOrders] = useState<any[]>([]);
-  const [paidAmount, setPaidAmount] = useState(0);
-  const [products, setProducts] = useState<any[]>([]);
-  const { productRefresh, setProductRefresh, orderRefresh, setOrderRefresh } = useSettingsContext();
+  const {
+    orders,
+    paidAmount,
+    total,
+    change,
+    handleQuantityChange,
+    handleClearOrder,
+    handleNumericInput,
+    handleSubmitOrder,
+    onAddToOrder,
+  } = useOrders();
+  const { products, getProductByCodeFromDB } = useProducts();
+  const textInputRef = useRef<TextInput | null>(null);
+  const [scanRefresh, setScanRefresh] = useState<boolean>(false);
 
-  // Fetch products with isBarcoded = 0
-  const fetchNonBarcodedProducts = async () => {
-    try {
-      const nonBarcodedProducts = await getNonBarcodedProducts(database);
-      setProducts(nonBarcodedProducts);
-    } catch (error) {
-      console.error('Error fetching non-barcoded products:', error);
+  useFocusEffect(
+    React.useCallback(() => {
+      setTimeout(() => {
+        if (textInputRef.current) {
+          textInputRef.current.focus();
+        }
+      }, 100);
+    }, [])
+  );
+
+  const handleSubmitEditing = async (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+    const input = event.nativeEvent.text;
+    const product = await getProductByCodeFromDB(input);
+    if (product) {
+      onAddToOrder(product);
     }
+    setScanRefresh(true);
   };
 
   useEffect(() => {
-    fetchNonBarcodedProducts();
-    setProductRefresh(false);
-  }, [productRefresh, setProductRefresh]);
-
-  const handleQuantityChange = (id: number, action: 'increment' | 'decrement') => {
-    setOrders((prevOrders) => {
-      const updatedOrders = prevOrders
-        .map((item) =>
-          item.id === id
-            ? {
-              ...item,
-              quantity: action === 'increment' ? item.quantity + 1 : item.quantity > 1 ? item.quantity - 1 : 0,
-            }
-            : item
-        )
-        .filter((item) => item.quantity > 0); // Filter out items with quantity 0
-      return updatedOrders;
-    });
-  };
-
-  const total = orders.reduce((sum, item) => sum + item.quantity * item.price, 0);
-  const change = paidAmount - total;
-
-  const handleSubmitOrder = async () => {
-    if (orders.length === 0) {
-      alert('No items in the order.');
-      return;
+    if (scanRefresh && textInputRef.current) {
+      textInputRef.current.clear();
+      textInputRef.current.focus();
+      setScanRefresh(false);
     }
-
-    try {
-      // Insert the main order and get the inserted order ID
-      const refNo = await generateRefNo(database);
-      const orderId = await insertOrder(database, refNo, total, paidAmount);
-      
-      if (!orderId) {
-        console.warn('Failed to insert order. Aborting order item insert.');
-        return;
-      }
-
-      // Map orders to orderItems with orderId
-      const orderItems = orders.map((item) => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-      }));
-
-      // Insert the order items
-      await insertOrderItems(database, orderId, orderItems);
-      await updateProductQuantity(database, orderItems);
-
-      console.log('Order successfully saved:', { orderId, orderItems });
-
-      // Clear order state
-      setOrderRefresh(true);
-      setProductRefresh(true);
-      setOrders([]);
-      setPaidAmount(0);
-      alert('Order submitted successfully!');
-    } catch (error) {
-      console.error('Error submitting order:', error);
-      alert('Failed to submit order. Please try again.');
-    }
-  };
-
-  const handleClearOrder = () => {
-    setOrders([]);
-    setPaidAmount(0);
-  };
-
-  // Add product to orders
-  const onAddToOrder = (product: any) => {
-    const existingOrder = orders.find((order) => order.code === product.product_code);
-    if (existingOrder) {
-      // If product already exists in orders, just increase the quantity
-      setOrders((prevOrders) =>
-        prevOrders.map((item) =>
-          item.code === product.product_code
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      );
-    } else {
-      // If product doesn't exist, add new order
-      setOrders((prevOrders) => [
-        ...prevOrders,
-        { id: product.id, code: product.product_code, name: product.product_name, quantity: 1, price: product.price },
-      ]);
-    }
-  };
-
-  // Handle numeric input
-  const handleNumericInput = (value: string) => {
-    if (value === 'C') {
-      setPaidAmount(0);
-    } else {
-      setPaidAmount((prevAmount) => {
-        const currentAmount = prevAmount;
-        return (currentAmount * 10) + parseInt(value, 10);
-      });
-    }
-  };
+  }, [scanRefresh]);
 
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        {/* Left Pane - Order List */}
+
+        {/* Focusable TextInput */}
+        <TextInput
+          ref={textInputRef}
+          style={[styles.input, { top: 1, left: 30 }]}
+          placeholder="Scan a barcode"
+          onSubmitEditing={handleSubmitEditing}
+          autoFocus={true} 
+          clearTextOnFocus={ true }
+        />
+
         <OrderList
           orders={orders}
           handleQuantityChange={handleQuantityChange}
@@ -143,14 +74,13 @@ export default function Pos() {
           handleClearOrder={handleClearOrder}
         />
 
-        {/* Middle Pane */}
         <View style={styles.middlePane}>
-
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity style={styles.clearButton} onPress={handleClearOrder}>
               <Text style={styles.clearButtonText}>Clear Items</Text>
             </TouchableOpacity>
           </View>
+
           <View style={styles.summaryContainer}>
             <View style={styles.summaryBox}>
               <Text style={styles.summaryLabel}>Total Price</Text>
@@ -168,15 +98,12 @@ export default function Pos() {
             </View>
           </View>
 
-
-          {/* Numeric Keypad */}
           <NumericKeypad
             handleNumericInput={handleNumericInput}
             displayValue={paidAmount.toString()}
           />
         </View>
 
-        {/* Right Pane - Custom Product List */}
         <QuickList products={products} onAddToOrder={onAddToOrder} />
       </View>
     </View>
@@ -184,6 +111,14 @@ export default function Pos() {
 }
 
 const styles = StyleSheet.create({
+  input: {
+    position: 'absolute',
+    height: 40,
+    borderWidth: 0,
+    width: '100%',
+    paddingLeft: 10,
+    fontSize: 16,
+  },
   container: {
     flex: 1,
     padding: 20,

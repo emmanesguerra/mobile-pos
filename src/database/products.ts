@@ -1,14 +1,5 @@
 import { SQLiteDatabase } from 'expo-sqlite';
-
-export type Product = {
-    id: number;
-    product_code: string;
-    product_name: string;
-    price: number;
-    stock: number;
-    isBarcoded: number; // or boolean, depending on your logic
-    bgColor?: string | null;
-};
+import { Product } from '@/src/interfaces/Product';
 
 // Get products with optional search and pagination
 export const getProducts = async (database: SQLiteDatabase, searchTerm: string = '', limit: number, offset: number): Promise<any[]> => {
@@ -50,6 +41,15 @@ export const getProductById = async (database: SQLiteDatabase, id: number): Prom
     const result = await database.getFirstAsync(
         'SELECT * FROM products WHERE id = ?',
         [id]
+    );
+
+    return result as Product | undefined;
+}
+
+export const getProductByCode = async (database: SQLiteDatabase, code: string): Promise<Product | undefined> => {
+    const result = await database.getFirstAsync(
+        'SELECT * FROM products WHERE product_code = ?',
+        [code]
     );
 
     return result as Product | undefined;

@@ -39,7 +39,7 @@ export default function InventoryEdit() {
             if (result) {
                 setProduct(result);
 
-                if (result.isBarcoded === 1) {
+                if (result.isBarcoded === true) {
                     setBarcodedForm({
                         code: result.product_code,
                         name: result.product_name,

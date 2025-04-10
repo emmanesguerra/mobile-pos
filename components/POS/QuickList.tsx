@@ -1,13 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-
-interface Product {
-  id: number;
-  product_name: string;
-  price: number;
-  bgColor: string;
-}
+import { Product } from '@/src/interfaces/Product';
 
 interface QuicklistProps {
   products: Product[];

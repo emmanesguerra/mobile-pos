@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   searchInput: {
+    height: 50,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
