@@ -50,6 +50,10 @@ export default function InventoryLists() {
     setCurrentPage(1); // Reset to page 1 whenever search query changes
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery(''); // Clear search query when button is pressed
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -92,12 +96,19 @@ export default function InventoryLists() {
       <View style={styles.innerContainer}>
         {/* Search and action buttons */}
         <View style={styles.searchAndButtons}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search products..."
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-          />
+          <View style={styles.searchWrapper}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search products..."
+              value={searchQuery}
+              onChangeText={handleSearchChange}
+            />
+            {searchQuery ? (
+              <TouchableOpacity onPress={handleClearSearch} style={styles.clearButton}>
+                <AntDesign name="closecircle" size={20} color="#888" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
 
           <TouchableOpacity
             style={[styles.button, styles.displayButton]}
@@ -173,13 +184,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   searchInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    flex: 1,
+    paddingHorizontal: 10,
+    width: 300, 
+    height: 50,
+  },
+  clearButton: {
+    marginLeft: 10,
   },
   button: {
     paddingVertical: 10,

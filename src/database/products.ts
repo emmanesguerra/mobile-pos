@@ -6,12 +6,12 @@ export const getProducts = async (database: SQLiteDatabase, searchTerm: string =
     try {
         let query = `
             SELECT * FROM products
-            ${searchTerm ? 'WHERE product_name LIKE ?' : ''}
+            ${searchTerm ? 'WHERE (product_name LIKE ? OR product_code LIKE ?)' : ''}
             ORDER BY id DESC
             LIMIT ? OFFSET ?;
         `;
 
-        const params = searchTerm ? [`%${searchTerm}%`, limit, offset] : [limit, offset];
+        const params = searchTerm ? [`%${searchTerm}%`, `%${searchTerm}%`, limit, offset] : [limit, offset];
 
         const result = await database.getAllAsync(query, params);
         return result;
@@ -20,6 +20,7 @@ export const getProducts = async (database: SQLiteDatabase, searchTerm: string =
         return [];
     }
 };
+
 export const getTotalProductsCount = async (database: SQLiteDatabase, searchTerm: string = ''): Promise<number> => {
     try {
         let query = `

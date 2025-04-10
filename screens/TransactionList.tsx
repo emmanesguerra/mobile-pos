@@ -10,6 +10,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import ModalComponent from '@/components/ModalComponent';
 import OrderComponent from '@/components/Order/OrderComponent';
 import { Picker } from '@react-native-picker/picker';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 export default function TransactionLists() {
@@ -129,27 +130,41 @@ export default function TransactionLists() {
     }
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery(''); // Clear search query when button is pressed
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
 
         <View style={styles.searchAndButtons}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search orders..."
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-          />
+          <View style={styles.searchWrapper}>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search orders..."
+                value={searchQuery}
+                onChangeText={handleSearchChange}
+              />
 
-          <Picker
-            selectedValue={filterType}
-            style={styles.picker}
-            onValueChange={(itemValue) => setFilterType(itemValue)}
-          >
-            <Picker.Item label="Display All" value="all" />
-            <Picker.Item label="Excess Payment" value="positiveChange" />
-            <Picker.Item label="Insufficient Payment" value="negativeChange" />
-          </Picker>
+              {searchQuery ? (
+                <TouchableOpacity onPress={handleClearSearch} style={styles.clearButton}>
+                  <AntDesign name="closecircle" size={20} color="#888" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+
+            <Picker
+              selectedValue={filterType}
+              style={styles.picker}
+              onValueChange={(itemValue) => setFilterType(itemValue)}
+            >
+              <Picker.Item label="Display All" value="all" />
+              <Picker.Item label="Excess Payment" value="positiveChange" />
+              <Picker.Item label="Insufficient Payment" value="negativeChange" />
+            </Picker>
+          </View>
         </View>
 
         {/* Table for Orders */}
@@ -242,16 +257,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   searchInput: {
-    height: 50,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    flex: 1,
+    paddingHorizontal: 10,
+    width: 300,
+    height: 50,
+  },
+  clearButton: {
+    marginLeft: 10,
+  },
+  picker: {
+    width: 300,
+    marginLeft: 10,
   },
 
   modalContent: {
@@ -263,9 +295,5 @@ const styles = StyleSheet.create({
   tableContainer: {
     flex: 1,
     padding: 0,
-  },
-  picker: {
-    width: 300,
-    marginLeft: 10,
   },
 });
