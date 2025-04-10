@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, NativeSyntheticEvent, TextInputSubmitEditingEventData, Keyboard } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import OrderList from '@/components/POS/OrderList';
 import QuickList from '@/components/POS/QuickList';
@@ -60,6 +60,7 @@ export default function Pos() {
           style={[styles.input, { top: 1, left: 30 }]}
           placeholder="Scan a barcode"
           onSubmitEditing={handleSubmitEditing}
+          showSoftInputOnFocus={false}
           autoFocus={true} 
           clearTextOnFocus={ true }
         />
