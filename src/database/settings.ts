@@ -6,8 +6,7 @@ export const getSettings = async (database: SQLiteDatabase): Promise<any[]> => {
         const result = await database.getAllAsync(`SELECT * FROM settings`);
         return result;
     } catch (error) {
-        console.error('Error fetching settings:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -20,8 +19,7 @@ export const getSettingValue = async (database: SQLiteDatabase, key: string): Pr
         );
         return result?.value ?? null;
     } catch (error) {
-        console.error(`Error fetching setting for key "${key}":`, error);
-        return null;
+        throw error;
     }
 };
 
@@ -34,8 +32,7 @@ export const createSetting = async (database: SQLiteDatabase, key: string, value
         );
         return true;
     } catch (error) {
-        console.error(`Error inserting setting "${key}":`, error);
-        return false;
+        throw error;
     }
 };
 
@@ -48,8 +45,7 @@ export const updateSetting = async (database: SQLiteDatabase, key: string, value
         );
         return true;
     } catch (error) {
-        console.error(`Error updating setting "${key}":`, error);
-        return false;
+        throw error;
     }
 };
 
@@ -62,7 +58,6 @@ export const saveSetting = async (database: SQLiteDatabase, key: string, value: 
             return await createSetting(database, key, value);
         }
     } catch (error) {
-        console.error(`Error upserting setting "${key}":`, error);
-        return false;
+        throw error;
     }
 };

@@ -15,7 +15,7 @@ export const useProducts = () => {
                 const result = await getNonBarcodedProducts(db);
                 setProducts(result);
             } catch (error) {
-                console.error('Error fetching non-barcoded products:', error);
+                alert('Error fetching non-barcoded products:' + error);
             }
         };
 
@@ -28,7 +28,6 @@ export const useProducts = () => {
             const product = await getProductByCode(db, code);
             return product;
         } catch (error) {
-            console.error('Error fetching product by code:', error);
             return undefined;
         }
     };

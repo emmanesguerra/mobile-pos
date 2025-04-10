@@ -16,8 +16,7 @@ export const getProducts = async (database: SQLiteDatabase, searchTerm: string =
         const result = await database.getAllAsync(query, params);
         return result;
     } catch (error) {
-        console.error('Error fetching products:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -33,8 +32,7 @@ export const getTotalProductsCount = async (database: SQLiteDatabase, searchTerm
         const result = await database.getAllAsync(query, params) as { total: number }[];
         return result[0].total; // Return the total count
     } catch (error) {
-        console.error('Error fetching products:', error);
-        return 0;
+        throw error;
     }
 };
 
@@ -63,8 +61,7 @@ export const getLowStockProducts = async (database: SQLiteDatabase, threshold: n
 
         return result;
     } catch (error) {
-        console.error('Error fetching low stock products:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -79,8 +76,7 @@ export const getNonBarcodedProducts = async (database: SQLiteDatabase): Promise<
         const result = await database.getAllAsync(query);
         return result;
     } catch (error) {
-        console.error('Error fetching non-barcoded products:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -134,7 +130,7 @@ export const updateProduct = async (
 
         return true;
     } catch (error) {
-        return false;
+        throw error;
     }
 };
 
@@ -151,6 +147,6 @@ export const updateProductQuantity = async (
         }
         return true;
     } catch (error) {
-        return false;
+        throw error;
     }
 };

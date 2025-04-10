@@ -61,9 +61,8 @@ export const initializeDatabase = async (database: SQLiteDatabase) => {
             `
         );
 
-        console.log('DB tables created successfully');
     } catch (error) {
-        console.error('Error initializing database:', error);
+        alert('An error occurred while initializing the database. Please try again later.');
     }
 };
 
@@ -74,8 +73,7 @@ export const dropDatabase = async (database: SQLiteDatabase) => {
         await database.execAsync(`DROP TABLE IF EXISTS products;`);
         await database.execAsync(`DROP TABLE IF EXISTS settings;`);
 
-        console.log('DB tables dropped successfully');
     } catch (error) {
-        console.error('Error dropping database tables:', error);
+        alert('An error occurred while initializing the database. Please try again later.');
     }
 };

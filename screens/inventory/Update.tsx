@@ -55,7 +55,7 @@ export default function InventoryEdit() {
                     });
                 }
             } else {
-                console.error('Product not found');
+                alert('Product not found');
             }
         };
 

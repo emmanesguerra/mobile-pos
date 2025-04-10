@@ -35,7 +35,7 @@ export default function InventoryLists() {
         const fetchedTotalProducts = await getTotalProductsCount(database, searchQuery);
         setTotalProducts(fetchedTotalProducts);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        alert('Error fetching products: ' + error);
       }
     };
 
@@ -65,7 +65,7 @@ export default function InventoryLists() {
       setLowStockProducts(lowStock);
       setIsModalVisible(true);
     } catch (error) {
-      console.error('Error fetching low stock products:', error);
+      alert('Error fetching low stock products: ' + error);
     }
   };
 

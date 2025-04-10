@@ -39,7 +39,7 @@ export default function TransactionLists() {
         setTotalOrders(fetchedTotalOrders);
 
       } catch (error) {
-        console.error('Error fetching data:', error);
+        alert('Error fetching data: ' + error);
       }
     };
 

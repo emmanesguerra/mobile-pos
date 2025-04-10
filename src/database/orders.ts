@@ -15,8 +15,7 @@ export const getOrders = async (database: SQLiteDatabase, searchTerm: string = '
         const result = await database.getAllAsync(query, params);
         return result;
     } catch (error) {
-        console.error('Error fetching products:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -33,8 +32,7 @@ export const getOrderItems = async (database: SQLiteDatabase, orderId: number): 
         );
         return result;
     } catch (error) {
-        console.error('Error fetching order items:', error);
-        return [];
+        throw error;
     }
 };
 
@@ -50,8 +48,7 @@ export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: strin
         const result = await database.getAllAsync(query, params) as { total: number }[];
         return result[0].total; // Return the total count
     } catch (error) {
-        console.error('Error fetching products:', error);
-        return 0;
+        throw error;
     }
 };
 
@@ -69,8 +66,7 @@ export const insertOrder = async (
 
         return result.lastInsertRowId ?? null;
     } catch (error) {
-        console.error('Error inserting order:', error);
-        return null;
+        throw error;
     }
 };
 
@@ -94,8 +90,7 @@ export const insertOrderItems = async (
         }
         return true;
     } catch (error) {
-        console.error('Error inserting order items:', error);
-        return false;
+        throw error;
     }
 };
 
@@ -115,14 +110,11 @@ export const updateOrder = async (
         );
 
         if (result.changes > 0) {
-            console.log('Order updated successfully.');
             return true;
         } else {
-            console.log('No changes were made.');
             return false;
         }
     } catch (error) {
-        console.error('Error updating order:', error);
-        return false;
+        throw error;
     }
 };

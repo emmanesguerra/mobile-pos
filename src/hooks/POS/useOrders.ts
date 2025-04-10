@@ -83,7 +83,6 @@ export const useOrders = () => {
             handleClearOrder();
             alert('Order submitted successfully!');
         } catch (error) {
-            console.error('Order submission failed:', error);
             alert('Failed to submit order. Please try again.');
         }
     };
