@@ -50,8 +50,6 @@ export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: strin
             WHERE (ref_no LIKE ? OR note LIKE ?)
         `;
 
-        console.log(filterType);
-
         if (filterType === 'negativeChange') {
             query += ` AND paidAmount < total`;
         } else if (filterType === 'positiveChange') {
@@ -61,7 +59,6 @@ export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: strin
         const params = [`%${searchTerm}%`, `%${searchTerm}%`];
 
         const result = await database.getAllAsync(query, params) as { total: number }[];
-        console.log(result[0].total);
         return result[0].total; // Return the total count
     } catch (error) {
         throw error;
