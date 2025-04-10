@@ -79,7 +79,9 @@ const ProductForm = ({
                                 style={[
                                     styles.input,
                                     {
-                                        backgroundColor: disabled === undefined ? 'transparent' : disabled ? '#D3D3D3' : 'transparent',
+                                        backgroundColor:
+                                            disabled === undefined ? 'transparent' : disabled ? '#D3D3D3' : 'transparent',
+                                        flex: 1, // make it take remaining space
                                     },
                                 ]}
                                 placeholder={placeholder}
@@ -89,7 +91,7 @@ const ProductForm = ({
                                 editable={disabled === undefined ? true : !disabled}
                             />
 
-                            {formData[key] ? (
+                            {formData[key] && !disabled ? (
                                 <TouchableOpacity onPress={() => handleClearInput(key)} style={styles.clearButton}>
                                     <AntDesign name="closecircle" size={20} color="#888" />
                                 </TouchableOpacity>
@@ -125,22 +127,21 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     inputWrapper: {
-        position: 'relative',
+        flexDirection: 'row', // make input and button side-by-side
+        alignItems: 'center',
         marginBottom: 10,
     },
+
     input: {
         height: 50,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
         paddingHorizontal: 10,
-        marginBottom: 10,
     },
+
     clearButton: {
-        position: 'absolute',
-        right: 10,
-        top: '50%',
-        transform: [{ translateY: -12 }],
+        marginLeft: 8,
     },
     pickerContainer: {
         marginBottom: 10,

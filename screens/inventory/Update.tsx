@@ -38,8 +38,7 @@ export default function InventoryEdit() {
             // Safely handle if the product doesn't exist
             if (result) {
                 setProduct(result);
-
-                if (result.isBarcoded === true) {
+                if (result.isBarcoded) {
                     setBarcodedForm({
                         code: result.product_code,
                         name: result.product_name,
