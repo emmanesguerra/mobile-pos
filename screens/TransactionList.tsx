@@ -31,23 +31,23 @@ export default function TransactionLists() {
     const fetchData = async () => {
       try {
         const offset = (currentPage - 1) * itemsPerPage;
-
-        const fetchedOrders = await getOrders(database, searchQuery, itemsPerPage, offset);
+        
+        const fetchedOrders = await getOrders(database, searchQuery, itemsPerPage, offset, filterType);
         setOrders(fetchedOrders);
-
-        const fetchedTotalOrders = await getTotalOrders(database, searchQuery);
+  
+        const fetchedTotalOrders = await getTotalOrders(database, searchQuery, filterType);
         setTotalOrders(fetchedTotalOrders);
-
+        
       } catch (error) {
         alert('Error fetching data: ' + error);
       }
     };
-
+  
     fetchData();
     if (orderRefresh) {
       setOrderRefresh(false);
     }
-  }, [searchQuery, itemsPerPage, currentPage, orderRefresh, setOrderRefresh]);
+  }, [searchQuery, itemsPerPage, currentPage, orderRefresh, setOrderRefresh, filterType]);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -80,6 +80,7 @@ export default function TransactionLists() {
     { field: 'paidAmount', label: 'Paid Amount (₱)' },
     { field: 'total', label: 'Total Amount (₱)' },
     { field: 'change', label: 'Change Amount (₱)' },
+    { field: 'note', label: 'Note' },
     { field: 'actions', label: 'Actions' },
   ];
 
@@ -91,22 +92,14 @@ export default function TransactionLists() {
       paidAmount: order.paidAmount,
       change: order.paidAmount - order.total,
       date: formatDate(order.created_at),
+      note: order.note,
       actions: (
         <TouchableOpacity onPress={() => handleViewOrder(order)}>
           <Fontisto name="preview" size={24} color="black" />
         </TouchableOpacity>
       ),
       changeStyle: order.paidAmount - order.total < 0 ? { color: 'red', fontWeight: 'bold' as 'bold' } : { color: 'green', fontWeight: 'bold' as 'bold' },
-    }))
-    .filter((order) => {
-      if (filterType === 'negativeChange') {
-        return order.change < 0;
-      } else if (filterType === 'positiveChange') {
-        return order.change > 0;
-      } else {
-        return true;
-      }
-    });
+    }));
 
   const handleFilterChange = (type: string) => {
     setFilterType(type);
@@ -183,6 +176,7 @@ export default function TransactionLists() {
               <Text style={order.changeStyle}>₱{order.change.toFixed(2)}</Text>
             ),
             date: order.date,
+            note: order.note,
             actions: order.actions,
           }))}
         />

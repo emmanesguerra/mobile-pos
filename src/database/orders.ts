@@ -1,21 +1,28 @@
 import { SQLiteDatabase } from 'expo-sqlite';
 
 // Get all sales records
-export const getOrders = async (database: SQLiteDatabase, searchTerm: string = '', limit: number, offset: number): Promise<any[]> => {
+export const getOrders = async (database: SQLiteDatabase, searchTerm: string, limit: number, offset: number, filterType: string = '') => {
+    let query = `
+      SELECT * FROM orders
+      WHERE (ref_no LIKE ? OR note LIKE ?)
+    `;
+
+    if (filterType === 'negativeChange') {
+        query += ` AND paidAmount < total`;
+    } else if (filterType === 'positiveChange') {
+        query += ` AND paidAmount > total`;
+    }
+
+    query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+
+    const params = [`%${searchTerm}%`, `%${searchTerm}%`, limit, offset];
+
     try {
-        let query = `
-            SELECT * FROM orders
-            ${searchTerm ? 'WHERE ref_no LIKE ?' : ''}
-            ORDER BY id DESC
-            LIMIT ? OFFSET ?;
-        `;
-
-        const params = searchTerm ? [`%${searchTerm}%`, limit, offset] : [limit, offset];
-
         const result = await database.getAllAsync(query, params);
         return result;
     } catch (error) {
-        throw error;
+        console.error('Error fetching orders:', error);
+        throw new Error('Failed to fetch orders');
     }
 };
 
@@ -36,16 +43,25 @@ export const getOrderItems = async (database: SQLiteDatabase, orderId: number): 
     }
 };
 
-export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: string = ''): Promise<number> => {
+export const getTotalOrders = async (database: SQLiteDatabase, searchTerm: string = '', filterType: string = ''): Promise<number> => {
     try {
         let query = `
             SELECT COUNT(*) as total FROM orders
-            ${searchTerm ? 'WHERE ref_no LIKE ?' : ''};
+            WHERE (ref_no LIKE ? OR note LIKE ?)
         `;
 
-        const params = searchTerm ? [`%${searchTerm}%`] : [];
+        console.log(filterType);
+
+        if (filterType === 'negativeChange') {
+            query += ` AND paidAmount < total`;
+        } else if (filterType === 'positiveChange') {
+            query += ` AND paidAmount > total`;
+        }
+
+        const params = [`%${searchTerm}%`, `%${searchTerm}%`];
 
         const result = await database.getAllAsync(query, params) as { total: number }[];
+        console.log(result[0].total);
         return result[0].total; // Return the total count
     } catch (error) {
         throw error;
